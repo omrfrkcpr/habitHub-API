@@ -16,7 +16,7 @@ module.exports = {
       });
     } else {
       res.errorStatusCode = 404;
-      throw new Error("No Tasks found", {
+      throw new Error("No Todos found", {
         cause: `Please create a task first`,
       });
     }
@@ -83,10 +83,10 @@ module.exports = {
     res.send({
       error: false,
       status: true,
-      message: `Your Task with id number ${id} is successfully deleted`,
+      message: `Your Todo with id number ${id} is successfully deleted`,
     });
   },
 
   // TASKS
-  //* getUnclosedTasks
+  //* getUnclosedTodos
 };
