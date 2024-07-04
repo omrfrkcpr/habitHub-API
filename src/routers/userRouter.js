@@ -2,15 +2,14 @@
 
 const router = require("express").Router();
 const {
-  create,
   list,
   read,
   update,
   destroy,
-} = require("../controllers/tagController");
+} = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
-router.route("/").all(authMiddleware).get(list).post(create);
+router.get("/", authMiddleware, list);
 router.route("/:id").all(authMiddleware).get(read).put(update).delete(destroy);
 
 module.exports = router;

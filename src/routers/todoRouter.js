@@ -3,22 +3,14 @@
 const router = require("express").Router();
 
 const {
-  list,
   create,
-  read,
+  list,
   update,
   destroy,
 } = require("../controllers/todoController");
-const validateIdHandler = require("../middlewares/validateIdHandler");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-router.route("/todos").get(list).post(create);
-
-router
-  .route("/todos/:id")
-  .all(validateIdHandler)
-  .get(read)
-  .put(update)
-  .patch()
-  .delete(destroy);
+router.route("/").all(authMiddleware).get(list).post(create);
+router.route("/:id").all(authMiddleware).put(update).delete(destroy);
 
 module.exports = router;
