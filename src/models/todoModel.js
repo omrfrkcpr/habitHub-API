@@ -1,42 +1,38 @@
 "use strict";
 
-const { sequelize, DataTypes } = require("../configs/db");
+const { mongoose } = require("../configs/dbConnection");
 
-const Todo = sequelize.define("todos", {
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
+const TodoSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String },
+    cardColor: { type: String, default: "#ADF7B6" },
+    repeat: { type: String, default: "daily" },
+    priority: {
+      type: String,
+      default: "standard",
+      enum: ["low", "standard", "high"],
+    },
+    dueDates: [{ type: Date }],
+    tagId: { type: mongoose.Schema.Types.ObjectId, ref: "Tag" },
+    isCompleted: { type: Boolean, default: false },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
-  description: {
-    type: DataTypes.STRING,
-  },
-  date: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  isDone: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  cardColor: {
-    type: DataTypes.STRING,
-  },
-  tagName: {
-    type: DataTypes.STRING,
-  },
-  repeatType: {
-    type: DataTypes.STRING,
-    defaultValue: "None",
-  },
-  priority: {
-    type: DataTypes.BIGINT, // 0: normal, 1: important, 2: very important
-    defaultValue: 0,
+  { collection: "todos", timestamps: true }
+);
+
+TodoSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    delete ret._id;
   },
 });
 
-// SYNC SEQUELIZE
-// sequelize.sync(); // run once
-// sequelize.sync({ force: true });
-// sequelize.sync({ alter: true });
+const Todo = mongoose.model("Todo", TodoSchema);
 
 module.exports = Todo;
