@@ -37,6 +37,7 @@ module.exports = {
     });
     res.status(201).send({
       error: false,
+      message: "New Account successfully created",
       token: tokenData.token,
       data,
     });
@@ -52,8 +53,9 @@ module.exports = {
     });
     res.status(202).send({
       error: false,
-      data,
+      message: "Account successfully updated",
       new: await User.find(filters),
+      data,
     });
   },
   // /:id => DELETE
@@ -69,9 +71,9 @@ module.exports = {
 
     res.status(data.deletedCount ? 204 : 404).send({
       error: !data.deletedCount,
-      data,
       message:
         "This user has been successfully deleted along with all Todos and Tags associated with this user.",
+      data,
     });
   },
 };
