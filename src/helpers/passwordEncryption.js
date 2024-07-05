@@ -1,18 +1,17 @@
 "use strict";
 
-const bcrypt = require("bcryptjs");
+/* -------------------------------------------------------------------------- */
+// passwordEncrypt(password:string):
+/* -------------------------------------------------------------------------- */
 
-const encryptPassword = async (password) => {
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  return hashedPassword;
-};
+const { pbkdf2Sync } = require("crypto"),
+  keyCode = process.env.SECRET_KEY,
+  loopCount = 1000,
+  charCount = 32,
+  encType = "sha512";
 
-const comparePassword = async (inputPassword, hashedPassword) => {
-  return await bcrypt.compare(inputPassword, hashedPassword);
-};
-
-module.exports = {
-  encryptPassword,
-  comparePassword,
+module.exports = function (password) {
+  return pbkdf2Sync(password, keyCode, loopCount, charCount, encType).toString(
+    "hex"
+  );
 };
