@@ -166,7 +166,7 @@ module.exports = {
 
       if (!user) {
         return res.status(401).send({
-          message: "No such acoount found, please try again",
+          message: "No such user found, please try again",
         });
       }
 
@@ -219,7 +219,7 @@ module.exports = {
       - If the user is found and the password matches, checks if the user is active.
       - If the user is active, generates a new JWT access token with a 9-minute expiration.
       - Returns the new access token in the response.
-      - If the user is not active, returns a 401 error indicating the account is inactive.
+      - If the user is not active, returns a 401 error indicating the user is inactive.
       - If the user is not found or the password does not match, returns a 401 error.
       - If there is no id or password in the refresh token, returns a 401 error.
       - If the refresh token is expired or invalid, returns a 401 error.
