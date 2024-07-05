@@ -4,7 +4,7 @@ const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
 
 module.exports = {
-  list: async (req, res) => {
+  listTags: async (req, res) => {
     try {
       const tags = await Tag.find({ userId: req.user._id });
       res.status(200).json(tags);
@@ -12,7 +12,7 @@ module.exports = {
       res.status(400).json({ message: error.message });
     }
   },
-  create: async (req, res) => {
+  createTag: async (req, res) => {
     try {
       const { name } = req.body;
       const tag = new Tag({ name, userId: req.user._id });
@@ -22,7 +22,7 @@ module.exports = {
       res.status(400).json({ message: error.message });
     }
   },
-  read: async (req, res) => {
+  readTag: async (req, res) => {
     try {
       const tag = await Tag.findById(req.params.id);
       if (!tag || tag.userId.toString() !== req.user._id.toString()) {
@@ -33,7 +33,7 @@ module.exports = {
       res.status(400).json({ message: error.message });
     }
   },
-  update: async (req, res) => {
+  updateTag: async (req, res) => {
     try {
       const tag = await Tag.findById(req.params.id);
       if (!tag || tag.userId.toString() !== req.user._id.toString()) {
@@ -47,7 +47,7 @@ module.exports = {
       res.status(400).json({ message: error.message });
     }
   },
-  destroy: async (req, res) => {
+  destroyTag: async (req, res) => {
     try {
       const tag = await Tag.findById(req.params.id);
       if (!tag || tag.userId.toString() !== req.user._id.toString()) {

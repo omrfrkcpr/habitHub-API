@@ -4,7 +4,7 @@ const Token = require("../models/tokenModel");
 
 module.exports = {
   // GET
-  list: async (req, res) => {
+  listTokens: async (req, res) => {
     // #swagger.ignore = true
 
     const data = await res.getModelList(Token);
@@ -17,7 +17,7 @@ module.exports = {
   },
 
   // POST
-  create: async (req, res) => {
+  createToken: async (req, res) => {
     // #swagger.ignore = true
 
     const data = await Token.create(req.body);
@@ -29,7 +29,7 @@ module.exports = {
   },
 
   // /:id -> GET
-  read: async (req, res) => {
+  readToken: async (req, res) => {
     // #swagger.ignore = true
 
     const data = await Token.findOne({ _id: req.params.id });
@@ -41,7 +41,7 @@ module.exports = {
   },
 
   // /:id -> DELETE
-  destroy: async (req, res) => {
+  destroyToken: async (req, res) => {
     // #swagger.ignore = true
 
     const data = await Token.deleteOne({ _id: req.params.id });

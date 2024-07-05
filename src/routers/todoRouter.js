@@ -3,17 +3,17 @@
 const router = require("express").Router();
 
 const {
-  create,
-  list,
-  update,
-  destroy,
+  listTodos,
+  createTodo,
+  updateTodo,
+  destroyTodo,
 } = require("../controllers/todoController");
 const { isLogin } = require("../middlewares/permissions");
 
 // BASE_URL = /todos
 
 router.use(isLogin);
-router.route("/").get(list).post(create);
-router.route("/:id").put(update).delete(destroy);
+router.route("/").get(listTodos).post(createTodo);
+router.route("/:id").put(updateTodo).delete(destroyTodo);
 
 module.exports = router;

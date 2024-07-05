@@ -2,17 +2,17 @@
 
 const router = require("express").Router();
 const {
-  list,
-  read,
-  create,
-  destroy,
+  listTokens,
+  readToken,
+  createToken,
+  destroyToken,
 } = require("../controllers/tokenController");
 const { isAdmin } = require("../middlewares/permissions");
 
 // BASE_URL: /tokens
 
 router.use(isAdmin);
-router.route("/").get(list).post(create);
-router.route("/:id").get(read).delete(destroy);
+router.route("/").get(listTokens).post(createToken);
+router.route("/:id").get(readToken).delete(destroyToken);
 
 module.exports = router;

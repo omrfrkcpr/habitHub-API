@@ -3,7 +3,7 @@
 const Todo = require("../models/todoModel");
 
 module.exports = {
-  list: async (req, res) => {
+  listTodos: async (req, res) => {
     try {
       const todos = await Todo.find({ userId: req.user.id });
       res.json(todos);
@@ -12,7 +12,7 @@ module.exports = {
       res.status(500).send("Server error");
     }
   },
-  create: async (req, res) => {
+  createTodo: async (req, res) => {
     const { name, description, cardColor, repeat, priority, dueDates, tagId } =
       req.body;
 
@@ -35,7 +35,7 @@ module.exports = {
       res.status(500).send("Server error");
     }
   },
-  update: async (req, res) => {
+  updateTodo: async (req, res) => {
     const {
       name,
       description,
@@ -81,7 +81,7 @@ module.exports = {
       res.status(500).send("Server error");
     }
   },
-  destroy: async (req, res) => {
+  destroyTodo: async (req, res) => {
     try {
       let todo = await Todo.findById(req.params.id);
 

@@ -1,49 +1,77 @@
 "use strict";
 
 const User = require("../models/userModel");
+const Token = require("../models/tokenModel");
+const Tag = require("../models/tagModel");
+const Todo = require("../models/todoModel");
+const passwordEncryption = require("../helpers/passwordEncryption");
 
 module.exports = {
-  list: async (req, res) => {
-    try {
-      const users = await User.find();
-      res.status(200).json(users);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+  // GET
+  listUsers: async (req, res) => {
+    const filters = req.user?.isAdmin ? {} : { _id: req.user._id };
+    const data = await res.getModelList(User, filters);
+    res.status(200).send({
+      error: false,
+      details: await res.getModelListDetails(User, filters),
+      data,
+    });
   },
-  read: async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+  // /:id => GET
+  readUser: async (req, res) => {
+    const filters = req.user?.isAdmin
+      ? { _id: req.params.id }
+      : { _id: req.user._id || req.user.id };
+    const data = await User.findOne(filters);
+    res.status(200).send({
+      error: false,
+      data,
+    });
   },
-  update: async (req, res) => {
-    try {
-      const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-      });
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+  // POST
+  createUser: async (req, res) => {
+    const data = await User.create(req.body);
+    const tokenData = await Token.create({
+      userId: data._id,
+      token: passwordEncryption((data._id || data.id) + Date.now()),
+    });
+    res.status(201).send({
+      error: false,
+      token: tokenData.token,
+      data,
+    });
   },
-  destroy: async (req, res) => {
-    try {
-      const user = await User.findByIdAndDelete(req.params.id);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      res.status(200).json({ message: "User deleted successfully" });
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
+  // PUT / PATCH
+  updateUser: async (req, res) => {
+    const filters = req.user?.isAdmin
+      ? { _id: req.params.id }
+      : { _id: req.user._id || req.user.id };
+    req.body.isAdmin = req.user?.isAdmin ? req.body.isAdmin : false;
+    const data = await User.updateOne(filters, req.body, {
+      runValidators: true,
+    });
+    res.status(202).send({
+      error: false,
+      data,
+      new: await User.find(filters),
+    });
+  },
+  // /:id => DELETE
+  destroyUser: async (req, res) => {
+    const filters = req.user?.isAdmin
+      ? { _id: req.params.id }
+      : { _id: req.user._id || req.user.id };
+    //console.log(filters, "filters");
+
+    await Todo.deleteOne({ userId: filters });
+    await Tag.deleteOne({ userId: filters });
+    const data = await User.deleteOne(filters);
+
+    res.status(data.deletedCount ? 204 : 404).send({
+      error: !data.deletedCount,
+      data,
+      message:
+        "This user has been successfully deleted along with all Todos and Tags associated with this user.",
+    });
   },
 };

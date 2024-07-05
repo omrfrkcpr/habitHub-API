@@ -2,6 +2,7 @@
 
 const { mongoose } = require("../configs/dbConnection");
 const { encryptPassword } = require("../helpers/passwordEncryption");
+const passwordValidator = require("../helpers/passwordValidator");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -33,33 +34,15 @@ const UserSchema = new mongoose.Schema(
       validate: [
         {
           validator: function (v) {
-            return /[A-Z]/.test(v);
+            const errors = passwordValidator(v);
+            return errors.length === 0;
           },
-          message: (props) =>
-            "Password must contain at least one uppercase letter",
-        },
-        {
-          validator: function (v) {
-            return /[a-z]/.test(v);
-          },
-          message: (props) =>
-            "Password must contain at least one lowercase letter",
-        },
-        {
-          validator: function (v) {
-            return /\d/.test(v);
-          },
-          message: (props) => "Password must contain at least one number",
-        },
-        {
-          validator: function (v) {
-            return /[!@#$%]/.test(v);
-          },
-          message: (props) =>
-            "Password must contain at least one special character (@,!,#,$,%)",
+          message: (props) => props.reason.join(", "),
         },
       ],
     },
+    isActive: { type: Boolean, default: true, required: true },
+    isAdmin: { type: Boolean, default: false },
   },
   { collection: "users", timestamps: true }
 );
