@@ -7,9 +7,11 @@ const {
   update,
   destroy,
 } = require("../controllers/userController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isAdmin, isLogin } = require("../middlewares/permissions");
 
-router.get("/", authMiddleware, list);
-router.route("/:id").all(authMiddleware).get(read).put(update).delete(destroy);
+// BASE_URL: /users
+
+router.route("/").get(isAdmin, list).post(create);
+router.route("/:id").all(isLogin).get(read).put(update).delete(destroy);
 
 module.exports = router;

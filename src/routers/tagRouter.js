@@ -8,9 +8,12 @@ const {
   update,
   destroy,
 } = require("../controllers/tagController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isLogin } = require("../middlewares/permissions");
 
-router.route("/").all(authMiddleware).get(list).post(create);
-router.route("/:id").all(authMiddleware).get(read).put(update).delete(destroy);
+// BASE_URL = /tags
+
+router.use(isLogin);
+router.route("/").get(list).post(create);
+router.route("/:id").get(read).put(update).delete(destroy);
 
 module.exports = router;

@@ -8,9 +8,12 @@ const {
   update,
   destroy,
 } = require("../controllers/todoController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const { isLogin } = require("../middlewares/permissions");
 
-router.route("/").all(authMiddleware).get(list).post(create);
-router.route("/:id").all(authMiddleware).put(update).delete(destroy);
+// BASE_URL = /todos
+
+router.use(isLogin);
+router.route("/").get(list).post(create);
+router.route("/:id").put(update).delete(destroy);
 
 module.exports = router;
