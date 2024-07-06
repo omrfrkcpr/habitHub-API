@@ -21,39 +21,40 @@ module.exports = {
 
     const { firstName, lastName, email, password } = req.body;
 
-    try {
-      // Check if user already exists
-      let user = await User.findOne({ email });
-      if (user) {
-        return res
-          .status(400)
-          .send({ error: true, message: "Email already exists" });
-      }
-
-      // Create new user
-      user = new User({
-        firstName,
-        lastName,
-        email,
-        password: bcrypt.hashSync(password, 10),
-      });
-
-      // Save new user to the database
-      const newUser = await user.save();
-
-      // Return success message with new user data
-      res.send({
-        error: false,
-        message: "New Account successfully created",
-        data: newUser,
-      });
-    } catch (err) {
-      // Return error message in case of failure
-      res.status(500).send({
-        error: true,
-        message: err.message,
-      });
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return res
+        .status(400)
+        .send({ error: true, message: "Email already exists" });
     }
+
+    // Create new user
+    user = new User({
+      firstName,
+      lastName,
+      email,
+      isActive: true,
+      isAdmin: false,
+      password: bcrypt.hashSync(password, 10),
+    });
+
+    // Save new user to the database
+    const newUser = await user.save();
+
+    // Create new token for new user
+    const tokenData = await Token.create({
+      userId: newUser._id || newUser.id,
+      token: passwordEncryption((newUser._id || newUser.id) + Date.now()),
+    });
+
+    // Return success message with new user data
+    res.status(201).send({
+      error: false,
+      message: "New Account successfully created",
+      token: tokenData.token,
+      data: newUser,
+    });
   },
   //! POST
   login: async (req, res) => {
@@ -71,29 +72,29 @@ module.exports = {
       - If any error occurs, a 401 error is returned.
     */
 
-    try {
-      const { email, password } = req.body;
-      // console.log(email, password);
+    const { email, password } = req.body;
+    console.log("Login attempt:", email, password);
 
-      if (email && password) {
+    if (email && password) {
+      try {
         const user = await User.findOne({ email });
-        // console.log(user);
+        console.log("User found:", user);
 
         if (user) {
           const isPasswordValid = bcrypt.compareSync(password, user.password);
-          // console.log("pass validated!");
+          console.log("Password validation result:", isPasswordValid);
 
           if (isPasswordValid && user.isActive) {
             //* TOKEN */
-            let tokenData = await Token.findOne({ _id: user._id || user.id });
-            //console.log(tokenData, "tokendata");
+            let tokenData = await Token.findOne({ userId: user._id });
+            console.log("Token data found:", tokenData);
+
             if (!tokenData) {
-              const tokenKey = passwordEncryption(
-                (user._id || user.id) + Date.now()
-              );
-              // console.log(tokenKey, "tokenkey");
+              const tokenKey = passwordEncryption(user._id + Date.now());
+              console.log("Generated token key:", tokenKey);
+
               tokenData = await Token.create({
-                userId: user._id || user.id,
+                userId: user._id,
                 token: tokenKey,
               });
             }
@@ -105,7 +106,7 @@ module.exports = {
             });
 
             const refreshData = {
-              id: user._id || user.id,
+              id: user._id,
               password: user.password,
             };
             const refreshTime = "3d";
@@ -116,6 +117,7 @@ module.exports = {
                 expiresIn: refreshTime,
               }
             );
+
             //! Response for TOKEN and JWT
             res.status(200).send({
               error: false,
@@ -127,22 +129,31 @@ module.exports = {
               user,
             });
           } else {
-            res.errorStatusCode = 401;
-            throw new Error("This account is no longer active.");
+            res.status(401).send({
+              error: true,
+              message:
+                "This account is no longer active or password is invalid.",
+            });
           }
         } else {
-          res.errorStatusCode = 401;
-          throw new Error(
-            "There is no account with this email address. Please register!"
-          );
+          res.status(401).send({
+            error: true,
+            message:
+              "There is no account with this email address. Please register!",
+          });
         }
-      } else {
-        res.errorStatusCode = 401;
-        throw new Error("Please enter your email and password to log in!");
+      } catch (error) {
+        console.error("Error during login process:", error);
+        res.status(500).send({
+          error: true,
+          message: "An error occurred during login. Please try again.",
+        });
       }
-    } catch (error) {
-      res.errorStatusCode = 401;
-      throw new Error("Something went wrong. Please try again!");
+    } else {
+      res.status(401).send({
+        error: true,
+        message: "Please enter your email and password to log in!",
+      });
     }
   },
   reset: async (req, res) => {
@@ -172,7 +183,7 @@ module.exports = {
 
       // Create Token
       const token = await jwt.sign(
-        { id: user._id || user.id },
+        { id: user?._id || user?.id },
         process.env.REFRESH_KEY,
         {
           expiresIn: "1h",

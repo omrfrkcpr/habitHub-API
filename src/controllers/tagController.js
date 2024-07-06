@@ -14,7 +14,7 @@ module.exports = {
     let listFilter = {};
 
     if (!req.user.isAdmin) {
-      listFilter.userId = req.user._id || req.user.id;
+      listFilter.userId = req.user?._id || req.user?.id;
     }
 
     const tags = await res.getModelList(Tag, listFilter);
@@ -32,7 +32,7 @@ module.exports = {
     };
 
     if (!req.user.isAdmin) {
-      listFilter.userId = req.user._id || req.user.id;
+      listFilter.userId = req.user?._id || req.user?.id;
     }
 
     const todos = await res.getModelList(Todo, listFilter);
@@ -51,7 +51,7 @@ module.exports = {
       - Sends a response indicating the success of the creation operation with a 201 status code.
     */
     const { name } = req.body;
-    const tag = new Tag({ name, userId: req.user._id || req.user.id });
+    const tag = new Tag({ name, userId: req.user?._id || req.user?.id });
     await tag.save();
     res.status(201).send({
       error: false,
@@ -69,7 +69,8 @@ module.exports = {
     const tag = await Tag.findOne({ _id: req.params.id });
     if (
       !tag ||
-      (!req.user.isAdmin && tag.userId.toString() !== req.user._id.toString())
+      (!req.user.isAdmin &&
+        tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
       res.errorStatusCode = 404;
       throw new Error("Tag not found");
@@ -88,7 +89,8 @@ module.exports = {
     const tag = await Tag.findOne({ _id: req.params.id });
     if (
       !tag ||
-      (!req.user.isAdmin && tag.userId.toString() !== req.user._id.toString())
+      (!req.user.isAdmin &&
+        tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
       res.errorStatusCode = 404;
       throw new Error("Tag not found");
@@ -113,7 +115,8 @@ module.exports = {
     const tag = await Tag.findOne({ _id: req.params.id });
     if (
       !tag ||
-      (!req.user.isAdmin && tag.userId.toString() !== req.user._id.toString())
+      (!req.user.isAdmin &&
+        tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
       res.errorStatusCode = 404;
       throw new Error("Tag not found");

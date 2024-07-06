@@ -17,7 +17,7 @@ module.exports = {
     };
 
     if (!req.user.isAdmin) {
-      listFilter.userId = req.user._id;
+      listFilter.userId = req.user?._id || req.user?.id;
     }
 
     const todos = await res.getModelList(Todo, listFilter, "tagId");
@@ -45,7 +45,7 @@ module.exports = {
       priority,
       dueDates,
       tagId,
-      userId: req.user.id,
+      userId: req.user?.id,
     });
 
     const todo = await newTodo.save();
@@ -83,7 +83,7 @@ module.exports = {
       throw new Error("Todo not found");
     }
 
-    if (todo.userId.toString() !== req.user.id) {
+    if (todo.userId.toString() !== (req.user?._id || req.user?.id)) {
       res.errorStatusCode = 401;
       throw new Error("Not authorized");
     }
@@ -127,7 +127,7 @@ module.exports = {
       throw new Error("Todo not found");
     }
 
-    if (todo.userId.toString() !== req.user.id) {
+    if (todo.userId.toString() !== (req.user?._id || req.user?.id)) {
       res.errorStatusCode = 401;
       throw new Error("Not authorized");
     }

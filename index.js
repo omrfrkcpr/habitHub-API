@@ -25,6 +25,9 @@ app.use(
   })
 );
 
+app.use(require("./src/middlewares/authentication"));
+app.use(require("./src/middlewares/findSearchSortPage"));
+
 app.all("/", (req, res) => {
   res.send("Welcome to HabitHub API");
 });

@@ -1,7 +1,7 @@
 "use strict";
 
 const { mongoose } = require("../configs/dbConnection");
-const { encryptPassword } = require("../helpers/passwordEncryption");
+const encryptPassword = require("../helpers/passwordEncryption");
 const passwordValidator = require("../helpers/passwordValidator");
 
 const UserSchema = new mongoose.Schema(
@@ -55,13 +55,13 @@ UserSchema.set("toJSON", {
   },
 });
 
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
-  this.password = await encryptPassword(this.password);
-  next();
-});
+// UserSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) {
+//     return next();
+//   }
+//   this.password = await encryptPassword(this.password);
+//   next();
+// });
 
 const User = mongoose.model("User", UserSchema);
 

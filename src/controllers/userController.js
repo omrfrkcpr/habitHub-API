@@ -15,7 +15,9 @@ module.exports = {
       - Returns the data along with details about the model list.
   */
 
-    const filters = req.user?.isAdmin ? {} : { _id: req.user._id };
+    const filters = req.user?.isAdmin
+      ? {}
+      : { _id: req.user?._id || req.user?.id };
     const data = await res.getModelList(User, filters);
     res.status(200).send({
       error: false,
@@ -33,7 +35,7 @@ module.exports = {
 
     const filters = req.user?.isAdmin
       ? { _id: req.params.id }
-      : { _id: req.user._id || req.user.id };
+      : { _id: req.user?._id || req.user?.id };
     const data = await User.findOne(filters);
     res.status(200).send({
       error: false,
@@ -59,37 +61,26 @@ module.exports = {
     if (isAdmin) {
       // set all admin user's as isAdmin = false
       await User.updateMany({ isAdmin: true }, { isAdmin: false });
-
-      // Create new user in database
-      const data = await User.create(req.body);
-
-      // Create new token for new user
-      const tokenData = await Token.create({
-        userId: data._id,
-        token: passwordEncryption((data._id || data.id) + Date.now()),
-      });
-
-      res.status(201).send({
-        error: false,
-        message: "New Account successfully created",
-        token: tokenData.token,
-        data,
-      });
-    } else {
-      // if isAdmin==false, then create directly a user
-      const data = await User.create(req.body);
-      const tokenData = await Token.create({
-        userId: data._id,
-        token: passwordEncryption((data._id || data.id) + Date.now()),
-      });
-
-      res.status(201).send({
-        error: false,
-        message: "New Account successfully created",
-        token: tokenData.token,
-        data,
-      });
     }
+
+    // Create new user in database
+    const data = await User.create({
+      ...req.body,
+      passpord: bcrypt.hashSync(password, 10),
+    });
+
+    // Create new token for new user
+    const tokenData = await Token.create({
+      userId: data._id || data.id,
+      token: passwordEncryption((data._id || data.id) + Date.now()),
+    });
+
+    res.status(201).send({
+      error: false,
+      message: "New Account successfully created",
+      token: tokenData.token,
+      data,
+    });
   },
   //& PUT / PATCH
   updateUser: async (req, res) => {
@@ -102,7 +93,7 @@ module.exports = {
 
     const filters = req.user?.isAdmin
       ? { _id: req.params.id }
-      : { _id: req.user._id || req.user.id };
+      : { _id: req.user?._id || req.user?.id };
     req.body.isAdmin = req.user?.isAdmin || false;
     const data = await User.updateOne(filters, req.body, {
       runValidators: true,
@@ -125,7 +116,7 @@ module.exports = {
 
     const filters = req.user?.isAdmin
       ? { _id: req.params.id }
-      : { _id: req.user._id || req.user.id };
+      : { _id: req.user?._id || req.user?.id };
     //console.log(filters, "filters");
 
     await Todo.deleteMany({ userId: filters });

@@ -28,6 +28,9 @@ module.exports = async (req, res, next) => {
     } else if (tokenKey[0] == "Bearer") {
       // JWT:
       jwt.verify(tokenKey[1], process.env.ACCESS_KEY, (error, data) => {
+        if (err) {
+          return res.status(401).json({ message: "Invalid Token" });
+        }
         req.user = data;
       });
     }
