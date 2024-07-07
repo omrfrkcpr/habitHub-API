@@ -1,6 +1,7 @@
 "use strict";
 
 const Todo = require("../models/todoModel");
+const { parseISO, startOfDay, endOfDay, isValid } = require("date-fns");
 
 module.exports = {
   listTodos: async (req, res) => {
@@ -11,9 +12,25 @@ module.exports = {
       - Uses `res.getModelList` to retrieve todos matching the filter and populates the `tagId` field.
       - Sends the retrieved todos along with additional details using `res.getModelListDetails`.
     */
-    const selectedDate = req.query.selectedDate;
+    const selectedDate = req.query.date;
+    const parsedDate = parseISO(selectedDate);
+
+    if (!isValid(parsedDate)) {
+      return res
+        .status(400)
+        .send({ error: true, message: "Invalid date format" });
+    }
+
+    const start = startOfDay(parsedDate);
+    const end = endOfDay(parsedDate);
+
     const listFilter = {
-      dueDates: { $elemMatch: { $eq: new Date(selectedDate) } },
+      dueDates: {
+        $elemMatch: {
+          $gte: start,
+          $lte: end,
+        },
+      },
     };
 
     if (!req.user.isAdmin) {

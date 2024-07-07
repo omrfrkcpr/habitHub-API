@@ -9,9 +9,9 @@ const TodoSchema = new mongoose.Schema(
     cardColor: { type: String, default: "#ADF7B6" },
     repeat: { type: String, default: "daily" },
     priority: {
-      type: String,
-      default: "standard",
-      enum: ["low", "standard", "high"],
+      type: Number,
+      default: 0,
+      enum: [-1, 0, 1],
     },
     dueDates: [{ type: Date }],
     tagId: { type: mongoose.Schema.Types.ObjectId, ref: "Tag" },
