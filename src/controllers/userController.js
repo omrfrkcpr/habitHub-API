@@ -67,7 +67,7 @@ module.exports = {
     // Create new user in database
     const data = await User.create({
       ...req.body,
-      passpord: bcrypt.hashSync(password, 10),
+      passpord: bcrypt.hashSync(req.body.password, 10),
     });
 
     // Create new token for new user
