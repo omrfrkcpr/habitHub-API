@@ -73,25 +73,25 @@ module.exports = {
     */
 
     const { email, password } = req.body;
-    console.log("Login attempt:", email, password);
+    // console.log("Login attempt:", email, password);
 
     if (email && password) {
       try {
         const user = await User.findOne({ email });
-        console.log("User found:", user);
+        // console.log("User found:", user);
 
         if (user) {
           const isPasswordValid = bcrypt.compareSync(password, user.password);
-          console.log("Password validation result:", isPasswordValid);
+          // console.log("Password validation result:", isPasswordValid);
 
           if (isPasswordValid && user.isActive) {
             //* TOKEN */
             let tokenData = await Token.findOne({ userId: user._id });
-            console.log("Token data found:", tokenData);
+            // console.log("Token data found:", tokenData);
 
             if (!tokenData) {
               const tokenKey = passwordEncryption(user._id + Date.now());
-              console.log("Generated token key:", tokenKey);
+              // console.log("Generated token key:", tokenKey);
 
               tokenData = await Token.create({
                 userId: user._id,
