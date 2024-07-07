@@ -1,6 +1,7 @@
 "use strict";
 
 const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
 const Token = require("../models/tokenModel");
 const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
@@ -87,6 +88,7 @@ module.exports = {
     /*
       - Sets isAdmin based on whether the requesting user (req.user) is an admin.
       - Updates the user's information in the database using User.updateOne().
+      - If password is updated, bcrypt hashes the new password before updating.
       - Uses runValidators: true to ensure validation rules are applied during update.
       - Returns a success message along with the updated user data.
     */
@@ -95,6 +97,30 @@ module.exports = {
       ? { _id: req.params.id }
       : { _id: req.user?._id || req.user?.id };
     req.body.isAdmin = req.user?.isAdmin || false;
+
+    // Check if password is being updated
+    if (req.body.password) {
+      // Fetch current user from database
+      const user = await User.findOne(filters);
+      if (!user) {
+        return res.status(404).send({
+          error: true,
+          message: "User not found",
+        });
+      }
+
+      // Compare new password with current hashed password
+      const isSamePassword = bcrypt.compareSync(
+        req.body.password,
+        user.password
+      );
+
+      // If new password is different, hash the new password
+      if (!isSamePassword) {
+        req.body.password = bcrypt.hashSync(req.body.password, 10);
+      }
+    }
+
     const data = await User.updateOne(filters, req.body, {
       runValidators: true,
     });
@@ -114,20 +140,34 @@ module.exports = {
       - Returns a response indicating success or failure of the deletion operation along with relevant messages.
     */
 
-    const filters = req.user?.isAdmin
+    const isFilter = req.user?.isAdmin
       ? { _id: req.params.id }
       : { _id: req.user?._id || req.user?.id };
-    //console.log(filters, "filters");
+    //console.log("isFilter":, isFilter);
 
-    await Todo.deleteMany({ userId: filters });
-    await Tag.deleteMany({ userId: filters });
-    const data = await User.deleteOne(filters);
+    const userIdFilter = req.user?.isAdmi
+      ? { userId: req.params.id }
+      : { userId: req.user?._id || req.user?.id };
 
-    res.status(data.deletedCount ? 204 : 404).send({
-      error: !data.deletedCount,
+    // Delete all todos and tags related to
+    await Todo.deleteMany(userIdFilter);
+    await Tag.deleteMany(userIdFilter);
+
+    // Delete user
+    const result = await User.deleteOne(isFilter);
+
+    if (result.deletedCount === 0) {
+      return res.status(404).send({
+        error: true,
+        message: "User not found",
+      });
+    }
+
+    res.status(204).send({
+      error: false,
       message:
-        "This user has been successfully deleted along with all Todos and Tags associated with this user.",
-      data,
+        "The user has been successfully deleted along with all Todos and Tags associated with this user.",
+      data: result,
     });
   },
 };

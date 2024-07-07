@@ -13,6 +13,15 @@ module.exports = {
       - Sends the retrieved todos along with additional details using `res.getModelListDetails`.
     */
     const selectedDate = req.query.date;
+
+    // Check if selectedDate is provided
+    if (!selectedDate) {
+      return res.status(400).send({
+        error: true,
+        message: "Please provide a specific date time in date query",
+      });
+    }
+
     const parsedDate = parseISO(selectedDate);
 
     if (!isValid(parsedDate)) {
