@@ -1,7 +1,7 @@
 {
   "name": "habithub_api",
   "version": "1.0.0",
-  "description": "habitHub-express-sequelize",
+  "description": "habitHub-express-mongoose",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
