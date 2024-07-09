@@ -9,7 +9,6 @@ const express = require("express");
 require("dotenv").config();
 
 const app = express();
-app.use(express.json());
 
 // Connect to MongoDB
 connectDB();
@@ -25,17 +24,43 @@ app.use(
   })
 );
 
+// Accept JSON:
+app.use(express.json());
+
+// Logger:
+// app.use(require("./src/middlewares/logger"));
+
+// Auhentication:
 app.use(require("./src/middlewares/authentication"));
-app.use(require("./src/middlewares/findSearchSortPage"));
+
+// findSearchSortPage / res.getModelList:
+app.use(require("./src/middlewares/queryHandler"));
 
 app.all("/", (req, res) => {
-  res.send("Welcome to HabitHub API");
+  res.send({
+    error: false,
+    message: "Welcome to HabitHub API",
+    docs: {
+      swagger: "/documents/swagger",
+      redoc: "/documents/redoc",
+      json: "/documents/json",
+    },
+    user: req.user,
+  });
 });
 
 // Routers
-app.use(require("./src/routers")); // by default catch index.js
+app.use(require("./src/routers"));
+app.use("/", require("./src/routes/"));
 
-// Middlewares
+app.use((req, res, next) => {
+  res.status(404).send({
+    error: true,
+    message: "Route not found!",
+  });
+});
+
+// errorHandler
 app.use(require("./src/middlewares/errorHandler"));
 
 app.listen(PORT, () => console.log(`server runned on http://${HOST}:${PORT}`));

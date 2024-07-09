@@ -27,11 +27,14 @@ module.exports = async (req, res, next) => {
       req.user = tokenData ? tokenData.userId : undefined;
     } else if (tokenKey[0] == "Bearer") {
       // JWT:
-      jwt.verify(tokenKey[1], process.env.ACCESS_KEY, (error, data) => {
-        if (err) {
-          return res.status(401).json({ message: "Invalid Token" });
+      jwt.verify(tokenKey[1], process.env.ACCESS_KEY, (error, accessData) => {
+        if (accessData) {
+          console.log("JWT verified");
+          req.user = accessData;
+        } else {
+          console.log("JWT failed to verify:", error);
+          req.user = false;
         }
-        req.user = data;
       });
     }
   }

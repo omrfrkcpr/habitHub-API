@@ -72,7 +72,7 @@ module.exports = {
       (!req.user.isAdmin &&
         tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
-      res.errorStatusCode = 404;
+      res.statusCode = 404;
       throw new Error("Tag not found");
     }
     res.status(200).send({ error: false, data: tag });
@@ -92,7 +92,7 @@ module.exports = {
       (!req.user.isAdmin &&
         tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
-      res.errorStatusCode = 404;
+      res.statusCode = 404;
       throw new Error("Tag not found");
     }
 
@@ -118,7 +118,7 @@ module.exports = {
       (!req.user.isAdmin &&
         tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
-      res.errorStatusCode = 404;
+      res.statusCode = 404;
       throw new Error("Tag not found");
     }
 

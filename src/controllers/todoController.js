@@ -105,12 +105,12 @@ module.exports = {
     let todo = await Todo.findById(req.params.id);
 
     if (!todo) {
-      res.errorStatusCode = 404;
+      res.statusCode = 404;
       throw new Error("Todo not found");
     }
 
     if (todo.userId.toString() !== (req.user?._id || req.user?.id)) {
-      res.errorStatusCode = 401;
+      res.statusCode = 401;
       throw new Error("Not authorized");
     }
 
@@ -149,12 +149,12 @@ module.exports = {
     let todo = await Todo.findOne({ _id: req.params.id });
 
     if (!todo) {
-      res.errorStatusCode = 404;
+      res.statusCode = 404;
       throw new Error("Todo not found");
     }
 
     if (todo.userId.toString() !== (req.user?._id || req.user?.id)) {
-      res.errorStatusCode = 401;
+      res.statusCode = 401;
       throw new Error("Not authorized");
     }
 

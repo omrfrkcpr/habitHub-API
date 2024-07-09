@@ -2,6 +2,9 @@
 
 //? Middleware Permissions
 /* -------------------------------------------------------------------------- */
+
+const { CustomError } = require("../errors/customError");
+
 module.exports = {
   isLogin: (req, res, next) => {
     // if (process.env.NODE_ENV == "dev") return next();
@@ -9,20 +12,20 @@ module.exports = {
     if (req.user && req.user.isActive) {
       next();
     } else {
-      res.errorStatusCode = 403;
+      res.statusCode = 403;
       throw new Error("No Permission: You must login to perform this action!");
     }
   },
 
   isAdmin: (req, res, next) => {
-    if (process.env.NODE_ENV == "dev") return next();
+    // if (process.env.NODE_ENV == "dev") return next();
 
     if (req.user && req.user.isActive && req.user.isAdmin) {
       next();
     } else {
-      res.errorStatusCode = 403;
-      throw new Error(
-        "No Permission: You must login and to be Admin to perform this action!"
+      throw new CustomError(
+        "No Permission: You must login and be admin to perform this action!",
+        403
       );
     }
   },
