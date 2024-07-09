@@ -5,7 +5,9 @@
 /* -------------------------------------------------------------------------- */
 
 const Token = require("../models/tokenModel");
+const TokenBlacklist = require("../models/tokenBlacklistModel");
 const jwt = require("jsonwebtoken");
+const { CustomError } = require("../errors/customError");
 
 /* -------------------------------------------------------------------------- */
 module.exports = async (req, res, next) => {
@@ -27,7 +29,15 @@ module.exports = async (req, res, next) => {
       req.user = tokenData ? tokenData.userId : undefined;
     } else if (tokenKey[0] == "Bearer") {
       // JWT:
-      jwt.verify(tokenKey[1], process.env.ACCESS_KEY, (error, accessData) => {
+      const token = tokenKey[1];
+      const blacklisted = await TokenBlacklist.findOne({ token: token });
+
+      if (blacklisted) {
+        req.user = false;
+        throw new CustomError("Token is blacklisted!", 401);
+      }
+
+      jwt.verify(token, process.env.ACCESS_KEY, (error, accessData) => {
         if (accessData) {
           console.log("JWT verified");
           req.user = accessData;

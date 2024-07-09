@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Token = require("../models/tokenModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
+const { CustomError } = require("../errors/customError");
 
 module.exports = {
   register: async (req, res) => {
@@ -24,9 +25,7 @@ module.exports = {
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
-      return res
-        .status(400)
-        .send({ error: true, message: "Email already exists" });
+      throw new CustomError("Email already exists!", 400);
     }
 
     // Create new user
@@ -34,8 +33,6 @@ module.exports = {
       firstName,
       lastName,
       email,
-      isActive: true,
-      isAdmin: false,
       password: bcrypt.hashSync(password, 10),
     });
 
@@ -43,17 +40,54 @@ module.exports = {
     const newUser = await user.save();
 
     // Create new token for new user
+    //^ Simple Token
     const tokenData = await Token.create({
       userId: newUser._id || newUser.id,
       token: passwordEncryption((newUser._id || newUser.id) + Date.now()),
+    });
+
+    //^ JWT
+    // accessToken
+    const accessInfo = {
+      key: process.env.ACCESS_KEY,
+      time: process.env.ACCESS_EXP || "30m",
+      data: {
+        id: newUser._id || newUser.id,
+        email: newUser.email,
+        password: newUser.password,
+        isActive: newUser.isActive,
+        isAdmin: newUser.isAdmin,
+      },
+    };
+
+    //refreshToken
+    const refreshInfo = {
+      key: process.env.REFRESH_KEY,
+      time: process.env.REFRESH_EXP || "3d",
+      data: {
+        id: newUser._id || newUser.id,
+        password: newUser.password,
+      },
+    };
+
+    // jwt.sign(data, secret_key, options)
+    const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
+      expiresIn: accessInfo.time,
+    });
+    const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
+      expiresIn: refreshInfo.time,
     });
 
     // Return success message with new user data
     res.status(201).send({
       error: false,
       message: "New Account successfully created",
+      bearer: {
+        access: accessToken,
+        refresh: refreshToken,
+      },
       token: tokenData.token,
-      data: newUser,
+      user: newUser,
     });
   },
   //! POST
@@ -76,84 +110,83 @@ module.exports = {
     // console.log("Login attempt:", email, password);
 
     if (email && password) {
-      try {
-        const user = await User.findOne({ email });
-        // console.log("User found:", user);
+      const user = await User.findOne({ email });
+      // console.log("User found:", user);
 
-        if (user) {
-          const isPasswordValid = bcrypt.compareSync(password, user.password);
-          // console.log("Password validation result:", isPasswordValid);
+      const isPasswordValid = bcrypt.compareSync(password, user.password);
+      // console.log("Password validation result:", isPasswordValid);
+      if (user && isPasswordValid) {
+        if (user.isActive) {
+          //^ SIMPLE TOKEN
+          let tokenData = await Token.findOne({
+            userId: user.id || user._id,
+          });
+          // console.log("Token data found:", tokenData);
 
-          if (isPasswordValid && user.isActive) {
-            //* TOKEN */
-            let tokenData = await Token.findOne({ userId: user._id });
-            // console.log("Token data found:", tokenData);
-
-            if (!tokenData) {
-              const tokenKey = passwordEncryption(user._id + Date.now());
-              // console.log("Generated token key:", tokenKey);
-
-              tokenData = await Token.create({
-                userId: user._id,
-                token: tokenKey,
-              });
-            }
-            //* JWT */
-            const accessData = user.toJSON();
-            const accessTime = "10m";
-            const accessToken = jwt.sign(accessData, process.env.ACCESS_KEY, {
-              expiresIn: accessTime,
-            });
-
-            const refreshData = {
-              id: user._id,
-              password: user.password,
-            };
-            const refreshTime = "3d";
-            const refreshToken = jwt.sign(
-              refreshData,
-              process.env.REFRESH_KEY,
-              {
-                expiresIn: refreshTime,
-              }
+          if (!tokenData) {
+            const tokenKey = passwordEncryption(
+              (user.id || user._id) + Date.now()
             );
+            // console.log("Generated token key:", tokenKey);
 
-            //! Response for TOKEN and JWT
-            res.status(200).send({
-              error: false,
-              token: tokenData.token,
-              bearer: {
-                access: accessToken,
-                refresh: refreshToken,
-              },
-              user,
-            });
-          } else {
-            res.status(401).send({
-              error: true,
-              message:
-                "This account is no longer active or password is invalid.",
+            tokenData = await Token.create({
+              userId: user.id || user._id,
+              token: tokenKey,
             });
           }
-        } else {
-          res.status(401).send({
-            error: true,
-            message:
-              "There is no account with this email address. Please register!",
+          //^ JWT
+          // accessToken
+          const accessInfo = {
+            key: process.env.ACCESS_KEY,
+            time: process.env.ACCESS_EXP || "30m",
+            data: {
+              id: user.id || user._id,
+              email: user.email,
+              password: user.password,
+              isActive: user.isActive,
+              isAdmin: user.isAdmin,
+            },
+          };
+          //refreshToken
+          const refreshInfo = {
+            key: process.env.REFRESH_KEY,
+            time: process.env.REFRESH_EXP || "3d",
+            data: {
+              id: user.id || user._id,
+              password: user.password,
+            },
+          };
+
+          // jwt.sign(data, secret_key, options)
+          const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
+            expiresIn: accessInfo.time,
           });
+          const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
+            expiresIn: refreshInfo.time,
+          });
+
+          //! Response for TOKEN and JWT
+          res.status(200).send({
+            error: false,
+            message: "You are successfully logged in!",
+            bearer: {
+              access: accessToken,
+              refresh: refreshToken,
+            },
+            token: tokenData.token,
+            user,
+          });
+        } else {
+          throw new CustomError("This Account is inactive!", 401);
         }
-      } catch (error) {
-        console.error("Error during login process:", error);
-        res.status(500).send({
-          error: true,
-          message: "An error occurred during login. Please try again.",
-        });
+      } else {
+        throw new CustomError(
+          "Wrong email or password. Please try again!",
+          401
+        );
       }
     } else {
-      res.status(401).send({
-        error: true,
-        message: "Please enter your email and password to log in!",
-      });
+      throw new CustomError("Please provide a valid email and password", 401);
     }
   },
   reset: async (req, res) => {
@@ -240,70 +273,56 @@ module.exports = {
     const refreshToken = req.body?.bearer?.refresh;
 
     if (refreshToken) {
-      try {
-        // Verify the refresh token
-        const jwtData = await jwt.verify(refreshToken, process.env.REFRESH_KEY);
+      // Verify the refresh token
+      const refreshData = await jwt.verify(
+        refreshToken,
+        process.env.REFRESH_KEY
+      );
 
-        if (jwtData) {
-          const { id, password } = jwtData;
+      if (refreshData) {
+        const { id, password } = refreshData;
 
-          // Check if id and password exist in token data
-          if (id && password) {
-            // Find the user by id in the database
-            const user = await User.findOne({ _id: id });
+        // Check if id and password exist in token data
+        if (id && password) {
+          // Find the user by id in the database
+          const user = await User.findOne({ _id: id });
 
-            if (user && user.password === password) {
-              // Check if the user is active
-              if (user.isActive) {
-                // Generate a new JWT access token
-                const accessToken = jwt.sign(
-                  user.toJSON(),
-                  process.env.ACCESS_KEY,
-                  { expiresIn: "9m" } // 9 minutes
-                );
+          if (user && user.password === password) {
+            // Check if the user is active
+            if (user.isActive) {
+              // Generate a new JWT access token
+              const accessToken = jwt.sign(
+                user.toJSON(),
+                process.env.ACCESS_KEY,
+                {
+                  expiresIn: process.env.ACCESS_EXP || "30m",
+                }
+              );
 
-                // Return the new access token
-                res.status(200).send({
-                  error: false,
-                  bearer: {
-                    access: accessToken,
-                  },
-                });
-              } else {
-                res.status(401).send({
-                  error: true,
-                  message: "This account is no longer active!",
-                });
-              }
-            } else {
-              res.status(401).send({
-                error: true,
-                message: "Wrong id or password.",
+              // Return the new access token
+              res.status(200).send({
+                error: false,
+                bearer: {
+                  access: accessToken,
+                },
               });
+            } else {
+              throw new CustomError("This account is inactive!", 401);
             }
           } else {
-            res.status(401).send({
-              error: true,
-              message: "There is no id and password in the refresh token.",
-            });
+            throw new CustomError("Wrong user data!", 401);
           }
         } else {
-          res.status(401).send({
-            error: true,
-            message: "JWT refresh token has expired or is invalid.",
-          });
+          throw new CustomError("No data found in refresh token!", 401);
         }
-      } catch (error) {
-        res.status(401).send({
-          error: true,
-          message: "JWT refresh token has expired or is invalid.",
-        });
+      } else {
+        throw new CustomError(
+          "JWT refresh token has expired or is invalid!",
+          401
+        );
       }
     } else {
-      res.status(401).send({
-        error: true,
-        message: "Please provide a refresh token.",
-      });
+      throw new CustomError("No refresh token provided!", 401);
     }
   },
   //! GET
@@ -315,29 +334,31 @@ module.exports = {
       - Returns a success message with the result of the token deletion.
     */
 
-    const auth = req.headers?.authorization || null;
+    const auth = req.headers?.authorization;
     const tokenKey = auth ? auth.split(" ") : null;
+    let deleted = null;
 
-    if (tokenKey && tokenKey[1]) {
-      try {
-        const tokenData = await Token.deleteOne({ token: tokenKey[1] });
-
-        res.send({
-          error: false,
-          message: "You are successfully logged out!",
-          data: tokenData,
-        });
-      } catch (error) {
-        res.status(500).send({
-          error: true,
-          message: "Logout failed. Please try again.",
-        });
+    if (tokenKey && tokenKey[0] == "Token") {
+      // Simple Token Logout
+      deleted = await Token.deleteOne({ token: tokenKey[1] });
+    } else if (tokenKey && tokenKey[0] == "Bearer") {
+      // JWT Token Logout
+      const token = tokenKey[1];
+      const decoded = jwt.verify(token, process.env.ACCESS_KEY);
+      if (decoded) {
+        // Add jwt token to the blacklist
+        const blacklisted = new TokenBlacklist({ token: token });
+        await blacklisted.save();
+        deleted = true; // Assuming this is successful due to Blacklisting
       }
-    } else {
-      res.status(400).send({
-        error: true,
-        message: "No authorization token provided.",
-      });
     }
+
+    res.status(deleted !== null ? 200 : 400).send({
+      error: !deleted !== null,
+      message:
+        deleted !== null
+          ? "You are successfully logged out!"
+          : "Logout failed. Please try again!",
+    });
   },
 };
