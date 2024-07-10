@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to HabitHub</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        text-align: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      .header img {
+        max-width: 150px;
+      }
+      .content {
+        padding: 20px;
+      }
+      .content h1 {
+        color: #333;
+      }
+      .content p {
+        line-height: 1.6;
+      }
+      .content a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .content a:hover {
+        text-decoration: underline;
+      }
+      .footer {
+        text-align: center;
+        padding: 10px 0;
+        border-top: 1px solid #e0e0e0;
+        margin-top: 20px;
+        font-size: 12px;
+        color: #999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="../../../../../app-logo.png" alt="HabitHub Logo" />
+      </div>
+      <div class="content">
+        <h1>Welcome to HabitHub, {{firstName}}!</h1>
+        <p>
+          Thank you for registering with HabitHub. We are thrilled to have you
+          on board!
+        </p>
+        <p>
+          HabitHub is designed to help you track and build positive habits,
+          providing you with the tools you need to achieve your goals and
+          improve your daily routine.
+        </p>
+        <h2>Get Started</h2>
+        <p>
+          To get started, please confirm your email address by clicking the link
+          below:
+        </p>
+        <p>
+          <a href="http://127.0.0.1:8000/verify-email?token={{token}}"
+            >Verify Email Address</a
+          >
+        </p>
+        <p>
+          If the link above does not work, please copy and paste the following
+          URL into your browser:
+        </p>
+        <p>
+          <a href="http://127.0.0.1:8000/verify-email?token={{token}}"
+            >http://127.0.0.1:8000/verify-email?token={{token}}</a
+          >
+        </p>
+        <h2>Need Help?</h2>
+        <p>
+          If you have any questions or need assistance, feel free to reply to
+          this email or visit our
+          <a href="http://127.0.0.1:8000/">Support Center</a>.
+        </p>
+        <p>
+          Thank you for choosing HabitHub. We look forward to helping you
+          achieve your goals!
+        </p>
+        <p>Best regards,</p>
+        <p>The HabitHub Team</p>
+      </div>
+      <div class="footer">
+        <p>&copy; 2024 HabitHub. All rights reserved.</p>
+        <p>37081 Goettingen, Germany</p>
+      </div>
+    </div>
+  </body>
+</html>

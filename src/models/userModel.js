@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema(
         },
       ],
     },
-    isActive: { type: Boolean, default: true },
+    isActive: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
   },
   { collection: "users", timestamps: true }

@@ -1,0 +1,24 @@
+Welcome to HabitHub, {{firstName}}!
+
+Thank you for registering with HabitHub. We are thrilled to have you on board!
+
+HabitHub is designed to help you track and build positive habits, providing you with the tools you need to achieve your goals and improve your daily routine.
+
+Get Started
+To get started, please confirm your email address by clicking the link below:
+http://127.0.0.1:8000/verify-email?token={{token}}
+
+If the link above does not work, please copy and paste the following URL into your browser:
+http://127.0.0.1:8000/verify-email?token={{token}}
+
+Need Help?
+If you have any questions or need assistance, feel free to reply to this email or visit our Support Center at http://127.0.0.1:8000/.
+
+Thank you for choosing HabitHub. We look forward to helping you achieve your goals!
+
+Best regards,
+The HabitHub Team
+
+---
+© 2024 HabitHub. All rights reserved.
+37081 Goettingen, Germany

@@ -4,8 +4,22 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Token = require("../models/tokenModel");
+const TokenVerification = require("../models/tokenVerificationModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 const { CustomError } = require("../errors/customError");
+const { sendEmail } = require("../configs/email/emailService");
+const {
+  getWelcomeEmailHtml,
+  getWelcomeEmailText,
+} = require("../configs/email/welcome/welcomeEmail");
+const {
+  getForgotPasswordEmailHtml,
+  getForgotPasswordEmailText,
+} = require("../configs/email/forgot/forgotPassword");
+const {
+  getResetPasswordEmailHtml,
+  getResetPasswordEmailText,
+} = require("../configs/email/reset/resetPassword");
 
 module.exports = {
   register: async (req, res) => {
@@ -78,6 +92,25 @@ module.exports = {
       expiresIn: refreshInfo.time,
     });
 
+    // Create new Token in TokenVerificationModel
+    const verificationTokenData = await TokenVerification.create({
+      userId: newUser._id || newUser.id,
+      token: passwordEncryption((newUser._id || newUser.id) + Date.now()),
+    });
+
+    // Send email to user
+    const emailSubject = "Welcome to HabitHub!";
+    const emailText = getWelcomeEmailText(
+      firstName,
+      verificationTokenData.token
+    );
+    const emailHtml = getWelcomeEmailHtml(
+      firstName,
+      verificationTokenData.token
+    );
+
+    await sendEmail(email, emailSubject, emailText, emailHtml);
+
     // Return success message with new user data
     res.status(201).send({
       error: false,
@@ -89,6 +122,41 @@ module.exports = {
       token: tokenData.token,
       user: newUser,
     });
+  },
+  verifyEmail: async (req, res) => {
+    const { token } = req.query;
+
+    try {
+      // Check existance of provided token
+      const tokenData = await TokenVerification.findOne({ token });
+
+      if (!tokenData) {
+        throw new CustomError(
+          "Verification failed. Please try to login or register again!",
+          400
+        );
+      }
+
+      // Find user
+      const user = await User.findById(tokenData.userId);
+
+      if (!user) {
+        throw new CustomError("Account not found. Please try again!", 404);
+      }
+
+      // Activate user status
+      user.isActive = true;
+      await user.save();
+
+      // Delete VerficiationToken
+      await Token.findByIdAndDelete(tokenData._id || tokenData.id);
+
+      // Kullanıcıyı contract sayfasına yönlendir
+      res.redirect("http://127.0.0.1:8000/contract");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Server error");
+    }
   },
   //! POST
   login: async (req, res) => {
@@ -177,7 +245,10 @@ module.exports = {
             user,
           });
         } else {
-          throw new CustomError("This Account is inactive!", 401);
+          throw new CustomError(
+            "This Account is inactive. Please verify your email address!",
+            401
+          );
         }
       } else {
         throw new CustomError(
@@ -187,6 +258,48 @@ module.exports = {
       }
     } else {
       throw new CustomError("Please provide a valid email and password", 401);
+    }
+  },
+  forgot: async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    //console.log(user, "forgot");
+    if (!user) {
+      throw new CustomError("There is no account with this email address", 401);
+    }
+
+    const forgotToken = await jwt.sign(
+      { id: user?._id || user?.id },
+      process.env.REFRESH_KEY,
+      {
+        expiresIn: "1d",
+      }
+    );
+    // console.log(token, "tokenGenerated");
+
+    if (token) {
+      // Send forgot request email to user
+      const forgotEmailSubject = "Password Reset Request!";
+      const forgotEmailText = getForgotPasswordEmailText(
+        firstName,
+        forgotToken
+      );
+      const forgotEmailHtml = getForgotPasswordEmailHtml(
+        firstName,
+        forgotToken
+      );
+
+      await sendEmail(
+        email,
+        forgotEmailSubject,
+        forgotEmailText,
+        forgotEmailHtml
+      );
+
+      res.send({
+        message: "Sent password reset request email",
+        error: false,
+      });
     }
   },
   reset: async (req, res) => {
@@ -200,55 +313,45 @@ module.exports = {
       - In case of error, a 500 error and an error message is returned.
     */
 
-    try {
-      const { email, password } = req.body;
-      // console.log(email, password, "resetPassword");
+    const { email, newPassword } = req.body;
+    const { token } = req.params.id;
+    // console.log(email, password, "resetPassword");
 
-      // Email ile kullanıcıyı bul
-      const user = await User.findOne({ email });
-      // console.log(user, "userFound");
+    // Search for this user with email
+    const user = await User.findOne({ email });
+    // console.log(user, "userFound");
 
-      if (!user) {
-        return res.status(401).send({
-          message: "No such user found, please try again",
-        });
-      }
+    if (!user) {
+      throw new CustomError("No such user found, please try again!", 404);
+    }
 
-      // Create Token
-      const token = await jwt.sign(
-        { id: user?._id || user?.id },
-        process.env.REFRESH_KEY,
-        {
-          expiresIn: "1h",
-        }
-      );
-      // console.log(token, "tokenGenerated");
+    // Verify token
+    const decoded = await jwt.verify(token, process.env.REFRESH_KEY);
+    // console.log(decoded, "tokenVerified");
 
-      // Verify token
-      const decoded = await jwt.verify(token, process.env.REFRESH_KEY);
-      // console.log(decoded, "tokenVerified");
+    const userId = decoded.id;
+    const userToUpdate = await User.findById(userId);
 
-      const userId = decoded.id;
-      const userToUpdate = await User.findById(userId);
+    if (userToUpdate) {
+      // Verify user and reset pass
+      userToUpdate.password = bcrypt.hashSync(newPassword, 10);
+      await userToUpdate.save();
+      // console.log(userToUpdate, "passwordUpdated");
 
-      if (userToUpdate) {
-        // Verify user and reset pass
-        userToUpdate.password = password;
-        await userToUpdate.save();
-        // console.log(userToUpdate, "passwordUpdated");
+      // Send reset email to user
+      const resetEmailSubject = "Password Reset Confirmation!";
+      const resetEmailText = getResetPasswordEmailText(firstName);
+      const resetEmailHtml = getResetPasswordEmailHtml(firstName);
 
-        res
-          .status(200)
-          .json({ message: "Password has been successfully reset!" });
-      } else {
-        res.status(404).send({
-          message: "User not found!",
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).send({
-        message: "Something went wrong. Please try again!",
+      await sendEmail(email, resetEmailSubject, resetEmailText, resetEmailHtml);
+
+      res.status(200).send({
+        error: false,
+        message: "Password has been successfully reset!",
+      });
+    } else {
+      res.status(404).send({
+        message: "User not found!",
       });
     }
   },
@@ -307,13 +410,16 @@ module.exports = {
                 },
               });
             } else {
-              throw new CustomError("This account is inactive!", 401);
+              throw new CustomError(
+                "This account is inactive.Please verify your email address!",
+                401
+              );
             }
           } else {
             throw new CustomError("Wrong user data!", 401);
           }
         } else {
-          throw new CustomError("No data found in refresh token!", 401);
+          throw new CustomError("No data found in refresh token!", 404);
         }
       } else {
         throw new CustomError(
