@@ -20,9 +20,27 @@ const {
   getResetPasswordEmailHtml,
   getResetPasswordEmailText,
 } = require("../configs/email/reset/resetPassword");
+const { passwordValidator } = require("../helpers/passwordValidator");
 
 module.exports = {
   register: async (req, res) => {
+    /*
+        #swagger.tags = ["Authentication"]
+        #swagger.summary = "Register"
+        #swagger.description = 'Register with valid firstName, lastName, email and password'
+        // _swagger.deprecated = true
+        // _swagger.ignore = true
+        #swagger.parameters["body"] = {
+            in: "body",
+            required: true,
+             schema: {
+              "firstName": "test",
+              "lastName": "test",
+              "email": "testUser@gmail.com",
+              "password": "Test@1234",
+             }
+      }
+    */
     /*
       - Retrieves firstName, lastName, email, and password from the incoming request.body.
       - Checks if the user with the given email already exists in the database.
@@ -30,8 +48,9 @@ module.exports = {
       - If the user does not exist, creates a new user with the provided details.
         - Password is hashed using bcrypt before saving.
       - Saves the new user to the database.
+      - Generates a verification token and saves it to TokenVerificationModel.
+      - Sends a welcome email to the user.
       - Returns a success message with the newly created user data.
-      - In case of an error, returns a 500 error with the error message.
     */
 
     const { firstName, lastName, email, password } = req.body;
@@ -48,6 +67,8 @@ module.exports = {
       lastName,
       email,
       password: bcrypt.hashSync(password, 10),
+      isActive: false,
+      isAdmin: false,
     });
 
     // Save new user to the database
@@ -123,11 +144,32 @@ module.exports = {
       user: newUser,
     });
   },
+  //! GET
   verifyEmail: async (req, res) => {
-    const { token } = req.query;
+    /*
+      #swagger.tags = ['Authentication']
+      #swagger.summary = 'Verification'
+      #swagger.description = 'Verify user email with a verification token'
+      #swagger.parameters['token'] = {
+        in: 'path',
+        description: 'Verification token received via email',
+        required: true,
+        type: 'string'
+      }
+  */
+    /*
+      - Retrieves the token from url.
+      - Checks if a token exists in TokenVerificationModel.
+      - Finds the user associated with the token in UserModel.
+      - Activates the user's account by setting isActive to true.
+      - Deletes the verification token from TokenVerificationModel.
+      - Redirects the user to the contract page upon successful verification.
+     */
+
+    const token = req.params.token;
 
     try {
-      // Check existance of provided token
+      // Check existance of provided token in tokenVerifications collection
       const tokenData = await TokenVerification.findOne({ token });
 
       if (!tokenData) {
@@ -151,8 +193,8 @@ module.exports = {
       // Delete VerficiationToken
       await Token.findByIdAndDelete(tokenData._id || tokenData.id);
 
-      // Kullanıcıyı contract sayfasına yönlendir
-      res.redirect("http://127.0.0.1:8000/contract");
+      // Redirect to setup page
+      res.redirect("http://127.0.0.1:8000/setup");
     } catch (error) {
       console.error(error);
       res.status(500).send("Server error");
@@ -160,6 +202,21 @@ module.exports = {
   },
   //! POST
   login: async (req, res) => {
+    /*
+      #swagger.tags = ["Authentication"]
+      #swagger.summary = "Login"
+      #swagger.description = 'Login with email and password for get simpleToken and JWT'
+      _swagger.deprecated = true
+      _swagger.ignore = true
+      #swagger.parameters["body"] = {
+          in: "body",
+          required: true,
+          schema: {
+              "email": "testUser@gmail.com",
+              "password": "Test@1234",
+          }
+      }
+    */
     /*
       - Retrieves the email and password from the incoming request.body.
       - Finds the user by email in the database.
@@ -171,7 +228,6 @@ module.exports = {
           - Generates a JWT access token and a refresh token.
       - Returns the tokens and user information in the response.
       - If the user is inactive or the password is invalid, a 401 error is returned.
-      - If any error occurs, a 401 error is returned.
     */
 
     const { email, password } = req.body;
@@ -261,6 +317,26 @@ module.exports = {
     }
   },
   forgot: async (req, res) => {
+    /*
+      #swagger.tags = ['Authentication']
+      #swagger.summary = 'Forgot'
+      #swagger.description = 'Request a url with email to reset password'
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              "email":"testUser@gmail.com"
+          }
+      }
+    */
+    /*
+      - Retrieves email from the incoming request.body.
+      - Finds the user by email in UserModel.
+      - Generates a password reset token using JWT and sends it to the user's email.
+      - Returns a success message upon sending the reset email.
+      - In case of an error (no account with provided email), returns a 401 error with an appropriate message.
+    */
+
     const { email } = req.body;
     const user = await User.findOne({ email });
     //console.log(user, "forgot");
@@ -304,59 +380,113 @@ module.exports = {
   },
   reset: async (req, res) => {
     /*
-      - Retrieves the e-mail and password in the incoming request.body.
-      - Finds the user by email in the database.
-      - If the user is not found, a 401 error is returned.
-      - If the user is found, it creates tokens.
-      - Validates the token and retrieves the user's identity.
-      - It updates the password according to the user's identity and returns a successful message.
-      - In case of error, a 500 error and an error message is returned.
+      #swagger.tags = ['Authentication']
+      #swagger.summary = 'JWT: Reset'
+      #swagger.description = 'Reset password with email, new password, and refresh token.'
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+            email: 'testUser@gmail.com',
+            newPassword: 'newPassword@123',
+          }
+      }
+      #swagger.parameters['token'] = {
+        in: 'path',
+        required: true,
+        type: 'string',
+        description: 'Refresh token received via email',
+      }
+    */
+    /*
+      - Retrieves email and newPassword from the incoming request.body.
+      - Finds the user by email in UserModel.
+      - Verifies the provided reset token using JWT.
+      - Validate new password before resetting
+      - Updates the user's password with the new hashed and validated password using bcrypt.
+      - Returns a success message and sending a confirmation email upon resetting the password.
     */
 
     const { email, newPassword } = req.body;
-    const { token } = req.params.id;
+    const { refreshToken } = req.params.token;
     // console.log(email, password, "resetPassword");
 
-    // Search for this user with email
-    const user = await User.findOne({ email });
-    // console.log(user, "userFound");
+    if (email && newPassword && refreshToken) {
+      // Validate the new password
+      const errors = passwordValidator(newPassword);
+      const errorMessages = errors.length < 2 ? "" : errors.join(", ");
 
-    if (!user) {
-      throw new CustomError("No such user found, please try again!", 404);
-    }
+      if (errors.length > 0) {
+        throw new CustomError(errorMessages, 400);
+      }
 
-    // Verify token
-    const decoded = await jwt.verify(token, process.env.REFRESH_KEY);
-    // console.log(decoded, "tokenVerified");
+      // Search for this user with email
+      const user = await User.findOne({ email });
+      // console.log(user, "userFound");
 
-    const userId = decoded.id;
-    const userToUpdate = await User.findById(userId);
+      if (!user) {
+        throw new CustomError("No such user found, please try again!", 404);
+      }
 
-    if (userToUpdate) {
-      // Verify user and reset pass
-      userToUpdate.password = bcrypt.hashSync(newPassword, 10);
-      await userToUpdate.save();
-      // console.log(userToUpdate, "passwordUpdated");
+      // Verify token
+      const decoded = await jwt.verify(refreshToken, process.env.REFRESH_KEY);
+      // console.log(decoded, "tokenVerified");
 
-      // Send reset email to user
-      const resetEmailSubject = "Password Reset Confirmation!";
-      const resetEmailText = getResetPasswordEmailText(firstName);
-      const resetEmailHtml = getResetPasswordEmailHtml(firstName);
+      if (!decoded || decoded.email !== email) {
+        throw new CustomError("Invalid or expired token", 400);
+      }
 
-      await sendEmail(email, resetEmailSubject, resetEmailText, resetEmailHtml);
+      const userId = decoded.id;
+      const userToUpdate = await User.findById(userId);
 
-      res.status(200).send({
-        error: false,
-        message: "Password has been successfully reset!",
-      });
+      if (userToUpdate) {
+        // Hash the new password
+        const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
+
+        // Reset validated and hashed password
+        userToUpdate.password = hashedNewPassword;
+        await userToUpdate.save();
+        // console.log(userToUpdate, "passwordUpdated");
+
+        // Send reset email to user
+        const resetEmailSubject = "Password Reset Confirmation!";
+        const resetEmailText = getResetPasswordEmailText(firstName);
+        const resetEmailHtml = getResetPasswordEmailHtml(firstName);
+
+        await sendEmail(
+          email,
+          resetEmailSubject,
+          resetEmailText,
+          resetEmailHtml
+        );
+
+        res.status(200).send({
+          error: false,
+          message: "Password has been successfully reset!",
+        });
+      } else {
+        throw new CustomError("User not found!", 404);
+      }
     } else {
-      res.status(404).send({
-        message: "User not found!",
-      });
+      throw new CustomError("Missing required fields!", 400);
     }
   },
   //! POST
   refresh: async (req, res) => {
+    /*
+      #swagger.tags = ['Authentication']
+      #swagger.summary = 'JWT: Refresh'
+      #swagger.description = 'Refresh accessToken with refreshToken'
+      #swagger.parameters['body'] = {
+        in: 'body',
+        required: true,
+        schema: {
+            bearer: {
+                refresh: '...refreshToken...'
+            }
+        }
+      }
+    */
     /*
       - Retrieves the refresh token from the incoming request.body.
       - Verifies the refresh token using the JWT verification method.
@@ -434,9 +564,14 @@ module.exports = {
   //! GET
   logout: async (req, res) => {
     /*
+      #swagger.tags = ["Authentication"]
+      #swagger.summary = "SimpleToken: Logout"
+      #swagger.description = 'Delete simple token key and put JWT to the Blacklist.'
+    */
+    /*
       - Retrieves the authorization header from the incoming request.headers.
       - Splits the authorization header to extract the token.
-      - Deletes the token from the Token collection in the database.
+      - Deletes the token from the Token collection in the database (for both simple token and JWT).
       - Returns a success message with the result of the token deletion.
     */
 
