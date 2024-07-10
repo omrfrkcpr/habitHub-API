@@ -193,8 +193,10 @@ module.exports = {
       // Delete VerficiationToken
       await Token.findByIdAndDelete(tokenData._id || tokenData.id);
 
-      // Redirect to setup page
-      res.redirect("http://127.0.0.1:8000/setup");
+      // Success response
+      res
+        .status(200)
+        .send({ error: false, message: "Account successfully verified!" });
     } catch (error) {
       console.error(error);
       res.status(500).send("Server error");
@@ -316,6 +318,7 @@ module.exports = {
       throw new CustomError("Please provide a valid email and password", 401);
     }
   },
+  //! POST
   forgot: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -372,12 +375,13 @@ module.exports = {
         forgotEmailHtml
       );
 
-      res.send({
+      res.status(200).send({
         message: "Sent password reset request email",
         error: false,
       });
     }
   },
+  //! POST
   reset: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -408,7 +412,7 @@ module.exports = {
     */
 
     const { email, newPassword } = req.body;
-    const { refreshToken } = req.params.token;
+    const refreshToken = req.params.token;
     // console.log(email, password, "resetPassword");
 
     if (email && newPassword && refreshToken) {

@@ -12,10 +12,12 @@ const {
 // BASE_URL: /auth
 
 router.post("/register", register);
+router.get("/verify-email/:token", reset);
 router.post("/login", login);
 router.get("/logout", logout);
 
 router.post("/refresh", refresh);
-router.post("/reset", reset);
+router.post("/forgot", reset);
+router.post("/reset/:token", reset);
 
 module.exports = router;
