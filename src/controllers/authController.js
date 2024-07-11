@@ -137,7 +137,7 @@ module.exports = {
       user: newUser,
     });
   },
-  //! GET
+  // GET
   verifyEmail: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -195,7 +195,7 @@ module.exports = {
       res.status(500).send("Server error");
     }
   },
-  //! POST
+  // POST
   login: async (req, res) => {
     /*
       #swagger.tags = ["Authentication"]
@@ -311,7 +311,7 @@ module.exports = {
       throw new CustomError("Please provide a valid email and password", 401);
     }
   },
-  //! POST
+  // POST
   forgot: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -366,7 +366,7 @@ module.exports = {
       });
     }
   },
-  //! POST
+  // POST
   reset: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -458,7 +458,7 @@ module.exports = {
       throw new CustomError("Missing required fields!", 400);
     }
   },
-  //! POST
+  // POST
   refresh: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -548,7 +548,7 @@ module.exports = {
       throw new CustomError("No refresh token provided!", 401);
     }
   },
-  //! GET
+  // GET
   logout: async (req, res) => {
     /*
       #swagger.tags = ["Authentication"]

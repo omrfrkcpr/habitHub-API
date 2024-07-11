@@ -8,25 +8,21 @@ const Todo = require("../models/todoModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 
 module.exports = {
-  //& GET
+  // GET
   listUsers: async (req, res) => {
     /*
-      - Filters users based on whether the requesting user (req.user) is an admin or not. If the user is an admin, all users are fetched; otherwise, only the requesting user's data is retrieved.
       - Uses the getModelList function to filter and retrieve users.
       - Returns the data along with details about the model list.
-  */
+    */
 
-    const filters = req.user?.isAdmin
-      ? {}
-      : { _id: req.user?._id || req.user?.id };
-    const data = await res.getModelList(User, filters);
+    const data = await res.getModelList(User);
     res.status(200).send({
       error: false,
-      details: await res.getModelListDetails(User, filters),
+      details: await res.getModelListDetails(User),
       data,
     });
   },
-  //& /:id => GET
+  // /:id => GET
   readUser: async (req, res) => {
     /*
       - Filters users based on whether the requesting user (req.user) is an admin or not. If the user is an admin, retrieves the requested user's details; otherwise, retrieves the details of the requesting user.
@@ -37,13 +33,14 @@ module.exports = {
     const filters = req.user?.isAdmin
       ? { _id: req.params.id }
       : { _id: req.user?._id || req.user?.id };
+
     const data = await User.findOne(filters);
     res.status(200).send({
       error: false,
       data,
     });
   },
-  //& POST
+  // POST
   createUser: async (req, res) => {
     /*
       - Sets isAdmin to false by default if not provided in the request body.
@@ -83,7 +80,7 @@ module.exports = {
       data,
     });
   },
-  //& PUT / PATCH
+  // /:id => PUT / PATCH
   updateUser: async (req, res) => {
     /*
       - Sets isAdmin based on whether the requesting user (req.user) is an admin.
@@ -131,7 +128,7 @@ module.exports = {
       data,
     });
   },
-  //& /:id => DELETE
+  // /:id => DELETE
   destroyUser: async (req, res) => {
     /*
       - Determines the filter based on whether the requesting user (req.user) is an admin.
@@ -156,17 +153,11 @@ module.exports = {
     // Delete user
     const result = await User.deleteOne(isFilter);
 
-    if (result.deletedCount === 0) {
-      return res.status(404).send({
-        error: true,
-        message: "User not found",
-      });
-    }
-
-    res.status(204).send({
-      error: false,
-      message:
-        "The user has been successfully deleted along with all Todos and Tags associated with this user.",
+    res.status(result.deletedCount ? 204 : 404).send({
+      error: !result.deletedCount,
+      message: result.deletedCount
+        ? "The user has been successfully deleted along with all Todos and Tags associated with this user."
+        : "User not found",
       data: result,
     });
   },

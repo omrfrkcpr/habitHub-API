@@ -4,6 +4,8 @@
 /* -------------------------------------------------------------------------- */
 
 const { CustomError } = require("../errors/customError");
+const Todo = require("../models/todoModel");
+const Tag = require("../models/tagModel");
 
 module.exports = {
   isLogin: (req, res, next) => {
@@ -12,8 +14,10 @@ module.exports = {
     if (req.user && req.user.isActive) {
       next();
     } else {
-      res.statusCode = 403;
-      throw new Error("No Permission: You must login to perform this action!");
+      throw new CustomError(
+        "No Permission: You must login to perform this action!",
+        403
+      );
     }
   },
 
@@ -35,14 +39,50 @@ module.exports = {
       if (req.user.isAdmin || req.params?.id == req.user._id) {
         next();
       } else {
-        res.errorStatusCode = 403;
-        throw new Error(
-          "No Permission: Only admin or owner can perform this action!"
+        throw new CustomError(
+          "No Permission: Only admin or owner can perform this action!",
+          403
         );
       }
     } else {
-      res.errorStatusCode = 403;
-      throw new Error("No Permission: Please log in!");
+      throw new CustomError("No Permission: Please log in!", 403);
+    }
+  },
+
+  isTodoOwnerOrAdmin: async (req, res, next) => {
+    if (req.user && req.user.isActive) {
+      const todo = await Todo.findById(req.params.id);
+      if (
+        req.user.isAdmin ||
+        String(todo.userId) === String(req.user.id || req.user._id)
+      ) {
+        next();
+      } else {
+        throw new CustomError(
+          "No Permission: Only admin or owner can perform this action!",
+          403
+        );
+      }
+    } else {
+      throw new CustomError("No Permission: Please log in!", 403);
+    }
+  },
+  isTagOwnerOrAdmin: async (req, res, next) => {
+    if (req.user && req.user.isActive) {
+      const tag = await Tag.findById(req.params.id);
+      if (
+        req.user.isAdmin ||
+        String(tag.userId) === String(req.user.id || req.user._id)
+      ) {
+        next();
+      } else {
+        throw new CustomError(
+          "No Permission: Only admin or owner can perform this action!",
+          403
+        );
+      }
+    } else {
+      throw new CustomError("No Permission: Please log in!", 403);
     }
   },
 };

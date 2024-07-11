@@ -48,6 +48,9 @@ module.exports = {
 
     res.status(data.deletedCount ? 204 : 404).send({
       error: !data.deletedCount,
+      message: data.deletedCount
+        ? "Token successfully deleted"
+        : "Token not found",
       data,
     });
   },

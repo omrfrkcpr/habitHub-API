@@ -16,9 +16,10 @@ const { idValidation } = require("../middlewares/idValidation");
 router.route("/").get(isAdmin, listUsers).post(createUser);
 router
   .route("/:id")
-  .all(idValidation, isAdminOrOwn)
+  .all(idValidation("User"), isAdminOrOwn)
   .get(readUser)
   .put(updateUser)
+  .patch(updateUser)
   .delete(destroyUser);
 
 module.exports = router;

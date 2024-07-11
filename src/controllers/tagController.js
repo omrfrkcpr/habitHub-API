@@ -4,6 +4,7 @@ const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
 
 module.exports = {
+  // GET
   listTags: async (req, res) => {
     /*
       - Determines the filter based on whether the requesting user (req.user) is an admin.
@@ -20,6 +21,7 @@ module.exports = {
     const tags = await res.getModelList(Tag, listFilter);
     res.status(200).send({ error: false, data: tags });
   },
+  // /:id => GET
   listTagTodos: async (req, res) => {
     /*
       - Sets the filter to fetch todos associated with a specific tag ID.
@@ -43,6 +45,7 @@ module.exports = {
       data: todos,
     });
   },
+  // POST
   createTag: async (req, res) => {
     /*
       - Extracts the tag name from the request body.
@@ -51,7 +54,12 @@ module.exports = {
       - Sends a response indicating the success of the creation operation with a 201 status code.
     */
     const { name } = req.body;
-    const tag = new Tag({ name, userId: req.user?._id || req.user?.id });
+
+    const userId = req.user.isAdmin
+      ? req.body.userId // userId must be provided in the request body by an admin
+      : req.user?._id || req.user?.id;
+
+    const tag = new Tag({ name, userId });
     await tag.save();
     res.status(201).send({
       error: false,
@@ -59,6 +67,7 @@ module.exports = {
       data: tag,
     });
   },
+  // /:id => GET
   readTag: async (req, res) => {
     /*
       - Tries to find the tag by ID from the database.
@@ -67,15 +76,9 @@ module.exports = {
       - If the tag is not found or the user is not authorized, sends a 404 status code with a "Tag not found" message.
     */
     const tag = await Tag.findOne({ _id: req.params.id });
-    if (
-      !tag ||
-      (!req.user.isAdmin &&
-        tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
-    ) {
-      throw new CustomError("Tag not found", 404);
-    }
     res.status(200).send({ error: false, data: tag });
   },
+  // /:id => PUT/PATCH
   updateTag: async (req, res) => {
     /*
       - Tries to find the tag by ID from the database.
@@ -85,23 +88,18 @@ module.exports = {
       - Sends a response indicating the success of the update operation with a 200 status code.
       - If the tag is not found or the user is not authorized, sends a 404 status code with a "Tag not found" message.
     */
-    const tag = await Tag.findOne({ _id: req.params.id });
-    if (
-      !tag ||
-      (!req.user.isAdmin &&
-        tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
-    ) {
-      throw new CustomError("Tag not found", 404);
-    }
+    const tag = await Tag.updateOne({ _id: req.params.id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-    tag.name = req.body.name || tag.name;
-    await tag.save();
-    res.status(200).send({
-      error: false,
-      message: "Tag successfully updated",
-      data: tag,
+    res.status(tag.modifiedCount ? 202 : 404).send({
+      error: !tag.modifiedCount,
+      message: tag.modifiedCount ? "Tag successfully updated" : "Tag not found",
+      new: tag,
     });
   },
+  // /:id => DELETE
   destroyTag: async (req, res) => {
     /*
       - Tries to find the tag by ID from the database.
@@ -110,16 +108,11 @@ module.exports = {
       - Sends a response indicating the success of the deletion operation with a 200 status code.
       - If the tag is not found or the user is not authorized, sends a 404 status code with a "Tag not found" message.
     */
-    const tag = await Tag.findOne({ _id: req.params.id });
-    if (
-      !tag ||
-      (!req.user.isAdmin &&
-        tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
-    ) {
-      throw new CustomError("Tag not found", 404);
-    }
+    const tag = await Tag.deleteOne({ _id: req.params.id });
 
-    await tag.remove();
-    res.status(204).send({ error: false, message: "Tag successfully deleted" });
+    res.status(tag.deletedCount ? 204 : 404).send({
+      error: !tag.deletedCount,
+      message: tag.deletedCount ? "Tag successfully deleted" : "Tag not found",
+    });
   },
 };

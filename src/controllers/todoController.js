@@ -5,6 +5,7 @@ const { parseISO, startOfDay, endOfDay, isValid } = require("date-fns");
 const { CustomError } = require("../errors/customError");
 
 module.exports = {
+  // GET
   listTodos: async (req, res) => {
     /*
       - Extracts the selected date from the query parameters.
@@ -17,18 +18,16 @@ module.exports = {
 
     // Check if selectedDate is provided
     if (!selectedDate) {
-      return res.status(400).send({
-        error: true,
-        message: "Please provide a specific date time in date query",
-      });
+      throw new CustomError(
+        "Please provide a specific date time in date query",
+        400
+      );
     }
 
     const parsedDate = parseISO(selectedDate);
 
     if (!isValid(parsedDate)) {
-      return res
-        .status(400)
-        .send({ error: true, message: "Invalid date format" });
+      throw new CustomError("Invalid date format", 400);
     }
 
     const start = startOfDay(parsedDate);
@@ -47,13 +46,23 @@ module.exports = {
       listFilter.userId = req.user?._id || req.user?.id;
     }
 
-    const todos = await res.getModelList(Todo, listFilter, "tagId");
+    const todos = await res.getModelList(Todo, listFilter, [
+      {
+        path: "userId",
+        select: "-__v",
+      },
+      {
+        path: "tagId",
+        select: "name",
+      },
+    ]);
     res.send({
       error: false,
       details: await res.getModelListDetails(Todo, listFilter),
       data: todos,
     });
   },
+  // POST
   createTodo: async (req, res) => {
     /*
       - Extracts the necessary fields for a new todo from the request body.
@@ -72,7 +81,9 @@ module.exports = {
       priority,
       dueDates,
       tagId,
-      userId: req.user?.id,
+      userId: req.user.isAdmin
+        ? req.body.userId // userId must be provided in the request body by an admin
+        : req.user?.id || req.user?._id,
     });
 
     const todo = await newTodo.save();
@@ -82,62 +93,57 @@ module.exports = {
       data: todo,
     });
   },
+  // GET /:id
+  readTodo: async (req, res) => {
+    /*
+      - Finds the todo by ID from the database.
+      - If the user is not an admin, ensures the todo belongs to the requesting user by adding userId to the query filter.
+      - Populates the `userId` and `tagId` fields of the retrieved todo for detailed information.
+        - `userId`: Populates with user details excluding the `__v` field.
+        - `tagId`: Populates with tag details including only the `name` field.
+      - Sends a response indicating the success of the retrieval operation along with the retrieved todo data.
+        - `error`: false, indicating the operation was successful.
+        - `data`: the retrieved todo object, populated with user and tag details.
+    */
+
+    const todo = await Todo.findOne({ _id: req.params.id }).populate([
+      {
+        path: "userId",
+        select: "-__v",
+      },
+      {
+        path: "tagId",
+        select: "name",
+      },
+    ]);
+
+    res.send({
+      error: false,
+      data: todo,
+    });
+  },
+  // /:id => PUT / PATCH
   updateTodo: async (req, res) => {
     /*
       - Extracts the fields to update for the todo from the request body.
-      - Finds the todo by ID from the database.
-      - If the todo is not found, sets a 404 error status and throws an error.
-      - If the requesting user is not the owner of the todo, sets a 401 error status and throws an error.
       - Updates the todo in the database with the provided fields.
       - Sends a response indicating the success of the update operation along with the updated todo data.
     */
 
-    const {
-      name,
-      description,
-      cardColor,
-      repeat,
-      priority,
-      dueDates,
-      tagId,
-      isCompleted,
-    } = req.body;
+    const updatedTodo = await Todo.updateOne({ _id: req.params.id }, req.body, {
+      runValidators: true,
+      new: true,
+    });
 
-    let todo = await Todo.findById(req.params.id);
-
-    if (!todo) {
-      res.statusCode = 404;
-      throw new Error("Todo not found");
-    }
-
-    if (todo.userId.toString() !== (req.user?._id || req.user?.id)) {
-      res.statusCode = 401;
-      throw new Error("Not authorized");
-    }
-
-    todo = await Todo.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          name,
-          description,
-          cardColor,
-          repeat,
-          priority,
-          dueDates,
-          tagId,
-          isCompleted,
-        },
-      },
-      { new: true }
-    );
-
-    res.send({
-      error: false,
-      message: "Todo successfully updated",
-      data: todo,
+    res.status(updatedTodo.modifiedCount ? 202 : 404).send({
+      error: !updatedTodo.modifiedCount,
+      message: updatedTodo.modifiedCount
+        ? "Todo successfully updated"
+        : "Todo not found",
+      new: updatedTodo,
     });
   },
+  // /:id => DELETE
   destroyTodo: async (req, res) => {
     /*
       - Finds the todo by ID from the database.
@@ -147,22 +153,13 @@ module.exports = {
       - Sends a response indicating the success of the deletion operation.
     */
 
-    let todo = await Todo.findOne({ _id: req.params.id });
+    const todo = await Todo.deleteOne({ _id: req.params.id });
 
-    if (!todo) {
-      res.statusCode = 404;
-      throw new Error("Todo not found");
-    }
-
-    if (todo.userId.toString() !== (req.user?._id || req.user?.id)) {
-      res.statusCode = 401;
-      throw new Error("Not authorized");
-    }
-
-    await Todo.deleteOne({ _id: req.params.id });
-
-    res
-      .status(204)
-      .send({ error: false, message: "Todo successfully deleted" });
+    res.status(todo.deletedCount ? 204 : 404).send({
+      error: !todo.deletedCount,
+      message: todo.deletedCount
+        ? "Todo successfully deleted"
+        : "Todo not found",
+    });
   },
 };
