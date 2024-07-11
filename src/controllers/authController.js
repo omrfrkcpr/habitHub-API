@@ -360,8 +360,9 @@ module.exports = {
       await sendEmail(email, forgotEmailSubject, forgotEmailHtml);
 
       res.status(200).send({
-        message: "Sent password reset request email",
         error: false,
+        message:
+          "Password reset link has been sent to your e-mail. Please check your mailbox.",
       });
     }
   },
@@ -443,8 +444,8 @@ module.exports = {
         await sendEmail(email, resetEmailSubject, resetEmailHtml);
 
         res.status(200).send({
+          message: "Your Password has been successfully reset!",
           error: false,
-          message: "Password has been successfully reset!",
         });
       } else {
         throw new CustomError("User not found!", 404);
