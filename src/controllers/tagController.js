@@ -72,8 +72,7 @@ module.exports = {
       (!req.user.isAdmin &&
         tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
-      res.statusCode = 404;
-      throw new Error("Tag not found");
+      throw new CustomError("Tag not found", 404);
     }
     res.status(200).send({ error: false, data: tag });
   },
@@ -92,8 +91,7 @@ module.exports = {
       (!req.user.isAdmin &&
         tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
-      res.statusCode = 404;
-      throw new Error("Tag not found");
+      throw new CustomError("Tag not found", 404);
     }
 
     tag.name = req.body.name || tag.name;
@@ -118,11 +116,10 @@ module.exports = {
       (!req.user.isAdmin &&
         tag.userId.toString() !== (req.user?._id || req.user?.id).toString())
     ) {
-      res.statusCode = 404;
-      throw new Error("Tag not found");
+      throw new CustomError("Tag not found", 404);
     }
 
     await tag.remove();
-    res.status(200).send({ error: false, message: "Tag successfully deleted" });
+    res.status(204).send({ error: false, message: "Tag successfully deleted" });
   },
 };

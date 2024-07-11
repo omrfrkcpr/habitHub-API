@@ -8,14 +8,15 @@ const {
   createUser,
   destroyUser,
 } = require("../controllers/userController");
-const { isAdmin, isLogin } = require("../middlewares/permissions");
+const { isAdmin, isAdminOrOwn } = require("../middlewares/permissions");
+const { idValidation } = require("../middlewares/idValidation");
 
 // BASE_URL: /users
 
 router.route("/").get(isAdmin, listUsers).post(createUser);
 router
   .route("/:id")
-  .all(isLogin)
+  .all(idValidation, isAdminOrOwn)
   .get(readUser)
   .put(updateUser)
   .delete(destroyUser);

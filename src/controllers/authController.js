@@ -17,7 +17,7 @@ const {
 const {
   getResetPasswordEmailHtml,
 } = require("../configs/email/reset/resetPassword");
-const { passwordValidator } = require("../helpers/passwordValidator");
+const validator = require("validator");
 
 module.exports = {
   register: async (req, res) => {
@@ -402,11 +402,15 @@ module.exports = {
 
     if (email && newPassword && refreshToken) {
       // Validate the new password
-      const errors = passwordValidator(newPassword);
-      const errorMessages = errors.length < 2 ? "" : errors.join(", ");
+      const isStrong = validator.isStrongPassword(password, [
+        { minLength: 6, symbols: "@!#$%" },
+      ]);
 
-      if (errors.length > 0) {
-        throw new CustomError(errorMessages, 400);
+      if (!isStrong) {
+        throw new CustomError(
+          "Invalid Password. Please provide a valid password",
+          400
+        );
       }
 
       // Search for this user with email

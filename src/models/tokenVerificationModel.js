@@ -1,6 +1,7 @@
 "use strict";
 
 const { mongoose } = require("../configs/dbConnection");
+const User = require("../models/userModel");
 
 const tokenVerificationSchema = new mongoose.Schema(
   {
@@ -14,6 +15,17 @@ const tokenVerificationSchema = new mongoose.Schema(
   },
   { collection: "tokenVerifications" }
 );
+
+// `post` middleware to check user status and delete user if necessary
+tokenVerificationSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    const user = await User.findById(doc.userId);
+    if (user && !user.isActive) {
+      // If user doesnt verify his account in 7 days. Token and User informations will be deleted from database.
+      await User.findByIdAndDelete(doc.userId);
+    }
+  }
+});
 
 const TokenVerification = mongoose.model(
   "TokenVerification",

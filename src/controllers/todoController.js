@@ -2,6 +2,7 @@
 
 const Todo = require("../models/todoModel");
 const { parseISO, startOfDay, endOfDay, isValid } = require("date-fns");
+const { CustomError } = require("../errors/customError");
 
 module.exports = {
   listTodos: async (req, res) => {
@@ -160,6 +161,8 @@ module.exports = {
 
     await Todo.deleteOne({ _id: req.params.id });
 
-    res.send({ error: false, message: "Todo successfully deleted" });
+    res
+      .status(204)
+      .send({ error: false, message: "Todo successfully deleted" });
   },
 };
