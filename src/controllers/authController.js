@@ -10,15 +10,12 @@ const { CustomError } = require("../errors/customError");
 const { sendEmail } = require("../configs/email/emailService");
 const {
   getWelcomeEmailHtml,
-  getWelcomeEmailText,
 } = require("../configs/email/welcome/welcomeEmail");
 const {
   getForgotPasswordEmailHtml,
-  getForgotPasswordEmailText,
 } = require("../configs/email/forgot/forgotPassword");
 const {
   getResetPasswordEmailHtml,
-  getResetPasswordEmailText,
 } = require("../configs/email/reset/resetPassword");
 const { passwordValidator } = require("../helpers/passwordValidator");
 
@@ -121,16 +118,12 @@ module.exports = {
 
     // Send email to user
     const emailSubject = "Welcome to HabitHub!";
-    const emailText = getWelcomeEmailText(
-      firstName,
-      verificationTokenData.token
-    );
     const emailHtml = getWelcomeEmailHtml(
       firstName,
       verificationTokenData.token
     );
 
-    await sendEmail(email, emailSubject, emailText, emailHtml);
+    await sendEmail(email, emailSubject, emailHtml);
 
     // Return success message with new user data
     res.status(201).send({
@@ -359,21 +352,12 @@ module.exports = {
     if (token) {
       // Send forgot request email to user
       const forgotEmailSubject = "Password Reset Request!";
-      const forgotEmailText = getForgotPasswordEmailText(
-        firstName,
-        forgotToken
-      );
       const forgotEmailHtml = getForgotPasswordEmailHtml(
         firstName,
         forgotToken
       );
 
-      await sendEmail(
-        email,
-        forgotEmailSubject,
-        forgotEmailText,
-        forgotEmailHtml
-      );
+      await sendEmail(email, forgotEmailSubject, forgotEmailHtml);
 
       res.status(200).send({
         message: "Sent password reset request email",
@@ -454,15 +438,9 @@ module.exports = {
 
         // Send reset email to user
         const resetEmailSubject = "Password Reset Confirmation!";
-        const resetEmailText = getResetPasswordEmailText(firstName);
         const resetEmailHtml = getResetPasswordEmailHtml(firstName);
 
-        await sendEmail(
-          email,
-          resetEmailSubject,
-          resetEmailText,
-          resetEmailHtml
-        );
+        await sendEmail(email, resetEmailSubject, resetEmailHtml);
 
         res.status(200).send({
           error: false,

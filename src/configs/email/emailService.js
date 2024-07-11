@@ -15,13 +15,12 @@ const transporter = nodemailer.createTransport({
 });
 // console.log(transporter);
 
-const sendEmail = async (to, subject, text, html) => {
+const sendEmail = async (to, subject, html) => {
   try {
     const info = await transporter.sendMail({
       from: `"HabitHub" <${process.env.NODEMAILER_EMAIL}>`,
       to,
       subject,
-      text,
       html,
     });
     console.log("Email successfully sent: %s", info.messageId);
