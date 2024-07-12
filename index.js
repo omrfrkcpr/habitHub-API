@@ -65,7 +65,7 @@ app.all("/", (req, res) => {
 
 // Routers
 app.use(require("./src/routers"));
-app.use("/", require("./src/routers/"));
+// app.use("/", require("./src/routers/"));
 
 app.use((req, res, next) => {
   res.status(404).send({

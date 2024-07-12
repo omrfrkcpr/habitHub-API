@@ -139,8 +139,8 @@ module.exports = {
     });
   },
   socialLogin: async (req, res) => {
-    if (req.isAuthenticated()) {
-      const user = req.user;
+    if (req.isAuthenticated() && res.user) {
+      const user = res.user;
 
       //^ Simple Token
       const tokenData = await Token.create({
@@ -186,6 +186,8 @@ module.exports = {
         token: tokenData,
         user,
       });
+      // Kullanıcıyı yönlendirme
+      res.redirect("http://127.0.0.1:3000/contract");
     } else {
       res.status(401).send({
         error: true,
