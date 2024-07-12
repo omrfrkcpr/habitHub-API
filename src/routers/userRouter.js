@@ -9,7 +9,7 @@ const {
   destroyUser,
 } = require("../controllers/userController");
 const { isAdmin, isAdminOrOwn } = require("../middlewares/permissions");
-const { idValidation } = require("../middlewares/idValidation");
+const idValidation = require("../middlewares/idValidation");
 
 // BASE_URL: /users
 

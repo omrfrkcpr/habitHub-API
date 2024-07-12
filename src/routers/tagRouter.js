@@ -10,7 +10,7 @@ const {
   destroyTag,
 } = require("../controllers/tagController");
 const { isLogin, isTagOwnerOrAdmin } = require("../middlewares/permissions");
-const { idValidation } = require("../middlewares/idValidation");
+const idValidation = require("../middlewares/idValidation");
 
 // BASE_URL = /tags
 
