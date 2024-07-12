@@ -65,7 +65,7 @@ module.exports = {
       lastName,
       email,
       password: bcrypt.hashSync(password, 10),
-      isActive: false,
+      isActive: false, // user will active his account via verification email
       isAdmin: false,
     });
 
@@ -137,6 +137,61 @@ module.exports = {
       token: tokenData.token,
       user: newUser,
     });
+  },
+  socialLogin: async (req, res) => {
+    if (req.isAuthenticated()) {
+      const user = req.user;
+
+      //^ Simple Token
+      const tokenData = await Token.create({
+        userId: user.id,
+        token: passwordEncryption(user.id + Date.now()),
+      });
+
+      //^ JWT
+      // accessToken
+      const accessInfo = {
+        key: process.env.ACCESS_KEY,
+        time: process.env.ACCESS_EXP || "30m",
+        data: {
+          id: user.id,
+          email: user.email,
+          isActive: true,
+          isAdmin: false,
+        },
+      };
+      const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
+        expiresIn: accessInfo.time,
+      });
+
+      //refreshToken
+      const refreshInfo = {
+        key: process.env.REFRESH_KEY,
+        time: process.env.REFRESH_EXP || "3d",
+        data: {
+          id: user.id,
+        },
+      };
+      const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
+        expiresIn: refreshInfo.time,
+      });
+
+      res.status(200).send({
+        error: false,
+        message: "You are successfully logged in!",
+        bearer: {
+          access: accessToken,
+          refresh: refreshToken,
+        },
+        token: tokenData,
+        user,
+      });
+    } else {
+      res.status(401).send({
+        error: true,
+        message: "Authentication failed",
+      });
+    }
   },
   // GET
   verifyEmail: async (req, res) => {

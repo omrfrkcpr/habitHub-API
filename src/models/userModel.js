@@ -40,6 +40,10 @@ const UserSchema = new mongoose.Schema(
         },
       ],
     },
+    twitterId: String,
+    facebookId: String,
+    googleId: String,
+    githubId: String,
     isActive: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
   },
@@ -51,6 +55,7 @@ UserSchema.set("toJSON", {
   versionKey: false,
   transform: function (doc, ret) {
     delete ret._id;
+    delete ret.password; // Ensure password is not returned
   },
 });
 

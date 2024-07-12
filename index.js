@@ -5,6 +5,7 @@ const app = express();
 
 require("dotenv").config();
 require("express-async-error");
+const session = require("express-session");
 
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
@@ -24,8 +25,21 @@ app.use(
   })
 );
 
+// Authentication Config
+require("./src/configs/auth/passport");
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set secure to true if using HTTPS
+  })
+);
+
 // Accept JSON:
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: false }));
 
 // Logger:
 // app.use(require("./src/middlewares/logger"));
