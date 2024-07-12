@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
 const Token = require("../models/tokenModel");
 const TokenVerification = require("../models/tokenVerificationModel");
+const TokenBlacklist = require("../models/tokenBlacklistModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 const { CustomError } = require("../errors/customError");
 const { sendEmail } = require("../configs/email/emailService");
@@ -349,11 +350,11 @@ module.exports = {
     );
     // console.log(token, "tokenGenerated");
 
-    if (token) {
+    if (forgotToken) {
       // Send forgot request email to user
       const forgotEmailSubject = "Password Reset Request!";
       const forgotEmailHtml = getForgotPasswordEmailHtml(
-        firstName,
+        user.firstName,
         forgotToken
       );
 
@@ -402,7 +403,7 @@ module.exports = {
 
     if (email && newPassword && refreshToken) {
       // Validate the new password
-      const isStrong = validator.isStrongPassword(password, [
+      const isStrong = validator.isStrongPassword(newPassword, [
         { minLength: 6, symbols: "@!#$%" },
       ]);
 
@@ -425,7 +426,7 @@ module.exports = {
       const decoded = await jwt.verify(refreshToken, process.env.REFRESH_KEY);
       // console.log(decoded, "tokenVerified");
 
-      if (!decoded || decoded.email !== email) {
+      if (!decoded) {
         throw new CustomError("Invalid or expired token", 400);
       }
 
@@ -443,7 +444,9 @@ module.exports = {
 
         // Send reset email to user
         const resetEmailSubject = "Password Reset Confirmation!";
-        const resetEmailHtml = getResetPasswordEmailHtml(firstName);
+        const resetEmailHtml = getResetPasswordEmailHtml(
+          userToUpdate.firstName
+        );
 
         await sendEmail(email, resetEmailSubject, resetEmailHtml);
 

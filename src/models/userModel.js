@@ -29,17 +29,16 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
       required: [true, "Password is required"],
-      set: function (password) {
-        if (
-          validator.isStrongPassword(password, [
-            { minLength: 6, symbols: "@!#$%" },
-          ])
-        ) {
-          return passwordEncrypt(password);
-        } else {
-          throw new CustomError("Password type is incorrect", 400);
-        }
-      },
+      validate: [
+        (password) => {
+          if (
+            !validator.isStrongPassword(password, [
+              { minLength: 6, symbols: "@!#$%" },
+            ])
+          )
+            throw new CustomError("Password is invalid");
+        },
+      ],
     },
     isActive: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },

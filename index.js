@@ -1,20 +1,20 @@
 "use strict";
 
-const PORT = process.env?.PORT || 8000;
-const HOST = process.env?.HOST || "127.0.0.1";
-const { connectDB } = require("./src/configs/dbConnection");
-
-require("express-async-error");
 const express = require("express");
-require("dotenv").config();
-
 const app = express();
 
+require("dotenv").config();
+require("express-async-error");
+
+const PORT = process.env?.PORT || 8000;
+const HOST = process.env?.HOST || "127.0.0.1";
+
 // Connect to MongoDB
+const { connectDB } = require("./src/configs/dbConnection");
 connectDB();
 
+// CORS Configs
 const cors = require("cors");
-
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, "http://localhost:3000"],
