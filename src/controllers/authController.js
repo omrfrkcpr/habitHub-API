@@ -25,7 +25,6 @@ const {
   generateAllTokens,
 } = require("../helpers/tokenGenerator");
 
-
 module.exports = {
   register: async (req, res) => {
     /*
@@ -79,7 +78,9 @@ module.exports = {
     const newUser = await user.save();
 
     // Get tokens for new user
-    const { tokenData, accessToken, refreshToken } = generateAllTokens(newUser);
+    const { tokenData, accessToken, refreshToken } = await generateAllTokens(
+      newUser
+    );
 
     // Create new Token in TokenVerificationModel
     const verificationTokenData = await TokenVerification.create({
@@ -255,6 +256,12 @@ module.exports = {
             refreshToken = generateRefreshToken(user);
           }
 
+          console.log("Login response data:", {
+            accessToken,
+            refreshToken,
+            tokenData,
+          }); // Debugging
+
           //! Response for TOKEN and JWT
           res.status(200).send({
             error: false,
@@ -368,8 +375,13 @@ module.exports = {
     */
 
     const { email, newPassword } = req.body;
-    const refreshToken = req.params.token;
-    // console.log(email, password, "resetPassword");
+    const { token } = req.params;
+
+    const refreshToken = token;
+
+    console.log("Email:", email); // Debugging
+    console.log("New Password:", newPassword); // Debugging
+    console.log("Refresh Token:", refreshToken); // Debugging
 
     if (email && newPassword && refreshToken) {
       // Validate the new password
@@ -386,7 +398,7 @@ module.exports = {
 
       // Search for this user with email
       const user = await User.findOne({ email });
-      // console.log(user, "userFound");
+      console.log(user, "userFound");
 
       if (!user) {
         throw new CustomError("No such user found, please try again!", 404);
@@ -394,7 +406,7 @@ module.exports = {
 
       // Verify token
       const decoded = await jwt.verify(refreshToken, process.env.REFRESH_KEY);
-      // console.log(decoded, "tokenVerified");
+      console.log(decoded, "tokenVerified");
 
       if (!decoded) {
         throw new CustomError("Invalid or expired token", 400);
@@ -410,7 +422,7 @@ module.exports = {
         // Reset validated and hashed password
         userToUpdate.password = hashedNewPassword;
         await userToUpdate.save();
-        // console.log(userToUpdate, "passwordUpdated");
+        console.log(userToUpdate, "passwordUpdated");
 
         // Send reset email to user
         const resetEmailSubject = "Password Reset Confirmation!";

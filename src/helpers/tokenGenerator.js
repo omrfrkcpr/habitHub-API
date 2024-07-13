@@ -11,6 +11,8 @@ const generateSimpleToken = async (user) => {
     userId: user._id || user.id,
     token: token,
   });
+
+  console.log("Simple Token generated: ", tokenData.token);
   return tokenData;
 };
 
@@ -27,9 +29,12 @@ const generateAccessToken = (user) => {
     },
   };
 
-  return jwt.sign(accessInfo.data, accessInfo.key, {
+  const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
     expiresIn: accessInfo.time,
   });
+
+  console.log("AccessToken generated: ", accessToken);
+  return accessToken;
 };
 
 // Generate Refresh Token
@@ -42,14 +47,17 @@ const generateRefreshToken = (user) => {
     },
   };
 
-  return jwt.sign(refreshInfo.data, refreshInfo.key, {
+  const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
     expiresIn: refreshInfo.time,
   });
+
+  console.log("RefreshToken generated: ", refreshToken);
+  return refreshToken;
 };
 
 // Generate All Tokens
 const generateAllTokens = async (user) => {
-  const tokenData = await generateSimpleToken(user._id || user.id);
+  const tokenData = await generateSimpleToken(user);
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
