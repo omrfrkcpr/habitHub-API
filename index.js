@@ -1,11 +1,13 @@
 "use strict";
 
+require("express-async-errors");
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
-require("express-async-error");
 const session = require("express-session");
+const passport = require("passport");
 
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
@@ -16,14 +18,13 @@ connectDB();
 
 // CORS Configs
 const cors = require("cors");
-app.use(
-  cors({
-    origin: [process.env.CLIENT_URL, "http://localhost:3000"],
-    methods: ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE"],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  })
-);
+const corsOptions = {
+  origin: [process.env.CLIENT_URL, "http://localhost:3000"],
+  methods: ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE"],
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 // Authentication Config
 require("./src/configs/auth/passport");
@@ -32,12 +33,19 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }, // Set secure to true if using HTTPS
+    // cookie: { secure: false }, // Set secure to true if using HTTPS
   })
 );
 
+// setup passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Accept JSON:
 app.use(express.json());
+
+// Use cookie-parser middleware
+app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -65,7 +73,7 @@ app.all("/", (req, res) => {
 
 // Routers
 app.use(require("./src/routers"));
-app.use("/", require("./src/routers/"));
+// app.use("/", require("./src/routers/"));
 
 app.use((req, res, next) => {
   res.status(404).send({
