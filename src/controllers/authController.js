@@ -19,6 +19,12 @@ const {
   getResetPasswordEmailHtml,
 } = require("../configs/email/reset/resetPassword");
 const validator = require("validator");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+  generateAllTokens,
+} = require("../helpers/tokenGenerator");
+const setDataToCookie = require("../helpers/setDataToCookie");
 
 module.exports = {
   register: async (req, res) => {
@@ -72,44 +78,8 @@ module.exports = {
     // Save new user to the database
     const newUser = await user.save();
 
-    // Create new token for new user
-    //^ Simple Token
-    const tokenData = await Token.create({
-      userId: newUser._id || newUser.id,
-      token: passwordEncryption((newUser._id || newUser.id) + Date.now()),
-    });
-
-    //^ JWT
-    // accessToken
-    const accessInfo = {
-      key: process.env.ACCESS_KEY,
-      time: process.env.ACCESS_EXP || "30m",
-      data: {
-        id: newUser._id || newUser.id,
-        email: newUser.email,
-        password: newUser.password,
-        isActive: newUser.isActive,
-        isAdmin: newUser.isAdmin,
-      },
-    };
-
-    //refreshToken
-    const refreshInfo = {
-      key: process.env.REFRESH_KEY,
-      time: process.env.REFRESH_EXP || "3d",
-      data: {
-        id: newUser._id || newUser.id,
-        password: newUser.password,
-      },
-    };
-
-    // jwt.sign(data, secret_key, options)
-    const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
-      expiresIn: accessInfo.time,
-    });
-    const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
-      expiresIn: refreshInfo.time,
-    });
+    // Get tokens for new user
+    const { tokenData, accessToken, refreshToken } = generateAllTokens(newUser);
 
     // Create new Token in TokenVerificationModel
     const verificationTokenData = await TokenVerification.create({
@@ -139,55 +109,11 @@ module.exports = {
     });
   },
   socialLogin: async (req, res) => {
-    if (req.isAuthenticated() && req.user) {
-      const user = req.user;
+    // if (req.isAuthenticated() && req.user)
+    if (req.user) {
+      const { user, tokenData, accessToken, refreshToken } = req.user;
 
-      //^ Simple Token
-      const tokenData = await Token.create({
-        userId: user.id,
-        token: passwordEncryption(user.id + Date.now()),
-      });
-
-      //^ JWT
-      // accessToken
-      const accessInfo = {
-        key: process.env.ACCESS_KEY,
-        time: process.env.ACCESS_EXP || "30m",
-        data: {
-          id: user.id,
-          email: user.email,
-          isActive: true,
-          isAdmin: false,
-        },
-      };
-      const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
-        expiresIn: accessInfo.time,
-      });
-
-      //refreshToken
-      const refreshInfo = {
-        key: process.env.REFRESH_KEY,
-        time: process.env.REFRESH_EXP || "3d",
-        data: {
-          id: user.id,
-        },
-      };
-      const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
-        expiresIn: refreshInfo.time,
-      });
-
-      res.status(200).send({
-        error: false,
-        message: "You are successfully logged in!",
-        bearer: {
-          access: accessToken,
-          refresh: refreshToken,
-        },
-        token: tokenData,
-        user,
-      });
-      // Kullanıcıyı yönlendirme
-      // res.redirect("http://127.0.0.1:3000/contract");
+      setTokensCookies(res, tokenData, accessToken, refreshToken, user);
     } else {
       res.status(401).send({
         error: true,
@@ -307,47 +233,18 @@ module.exports = {
           });
           // console.log("Token data found:", tokenData);
 
+          let accessToken = "";
+          let refreshToken = "";
+
           if (!tokenData) {
-            const tokenKey = passwordEncryption(
-              (user.id || user._id) + Date.now()
-            );
-            // console.log("Generated token key:", tokenKey);
-
-            tokenData = await Token.create({
-              userId: user.id || user._id,
-              token: tokenKey,
-            });
+            const tokens = generateAllTokens(user);
+            accessToken = tokens.accessToken;
+            refreshToken = tokens.refreshToken;
+            tokenData = tokens.tokenData;
+          } else {
+            accessToken = generateAccessToken(user);
+            refreshToken = generateRefreshToken(user);
           }
-          //^ JWT
-          // accessToken
-          const accessInfo = {
-            key: process.env.ACCESS_KEY,
-            time: process.env.ACCESS_EXP || "30m",
-            data: {
-              id: user.id || user._id,
-              email: user.email,
-              password: user.password,
-              isActive: user.isActive,
-              isAdmin: user.isAdmin,
-            },
-          };
-          //refreshToken
-          const refreshInfo = {
-            key: process.env.REFRESH_KEY,
-            time: process.env.REFRESH_EXP || "3d",
-            data: {
-              id: user.id || user._id,
-              password: user.password,
-            },
-          };
-
-          // jwt.sign(data, secret_key, options)
-          const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
-            expiresIn: accessInfo.time,
-          });
-          const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
-            expiresIn: refreshInfo.time,
-          });
 
           //! Response for TOKEN and JWT
           res.status(200).send({
@@ -362,7 +259,7 @@ module.exports = {
           });
         } else {
           throw new CustomError(
-            "This Account is inactive. Please verify your email address!",
+            "Unverified Account. Please verify your email address!",
             401
           );
         }
@@ -402,7 +299,7 @@ module.exports = {
     const user = await User.findOne({ email });
     //console.log(user, "forgot");
     if (!user) {
-      throw new CustomError("There is no account with this email address", 401);
+      throw new CustomError("Wrong email address!", 401);
     }
 
     const forgotToken = await jwt.sign(
@@ -595,7 +492,7 @@ module.exports = {
               });
             } else {
               throw new CustomError(
-                "This account is inactive.Please verify your email address!",
+                "Unverified Account. Please verify your email address!",
                 401
               );
             }

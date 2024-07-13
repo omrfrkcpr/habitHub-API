@@ -4,18 +4,17 @@ const FacebookStrategy = require("passport-facebook").Strategy;
 const GitHubStrategy = require("passport-github2").Strategy;
 const TwitterStrategy = require("passport-twitter").Strategy;
 const User = require("../../models/userModel");
+const bcrypt = require("bcrypt");
+const { generateAllTokens } = require("../../helpers/tokenGenerator");
 
-passport.serializeUser((user, done) => {
-  done(null, user.id);
+// function to serialize a user/profile object into the session
+passport.serializeUser(function (user, done) {
+  done(null, user);
 });
 
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err, null);
-  }
+// function to deserialize a user/profile object into the session
+passport.deserializeUser(function (user, done) {
+  done(null, user);
 });
 
 passport.use(
@@ -25,7 +24,8 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: `/auth/google/callback`,
     },
-    async (token, tokenSecret, profile, done) => {
+    async (accessToken, refreshToken, profile, done) => {
+      // console.log("Profile", profile)
       try {
         let user = await User.findOne({ email: profile.emails[0].value });
         if (!user) {
@@ -34,11 +34,19 @@ passport.use(
             firstName: profile.name.givenName,
             lastName: profile.name.familyName,
             email: profile.emails[0].value,
+            password: bcrypt.hashSync(
+              A + profile.name.familyName + profile.id,
+              10
+            ),
             isActive: true,
           });
           await user.save();
         }
-        return done(null, user);
+
+        const { tokenData, accessToken, refreshToken } =
+          await generateAllTokens(user);
+
+        return done(null, { user, accessToken, tokenData, refreshToken });
       } catch (err) {
         return done(err, null);
       }
@@ -87,55 +95,37 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        let user = await User.findOne({ email: profile?.emails[0]?.value });
 
         if (!user) {
-          const firstName = profile.displayName
+          const firstName = profile?.displayName
             ? profile.displayName.split(" ")[0]
             : "";
-          const lastName = profile.displayName
+          const lastName = profile?.displayName
             ? profile.displayName.split(" ")[1]
             : "";
-          const email = profile.emails
-            ? profile.emails[0].value
-            : `${profile.username}@github.com`;
+          const email = profile?.emails
+            ? profile?.emails[0]?.value
+            : `${profile?.username}@github.com`;
 
           user = new User({
             githubId: profile.id,
             firstName,
             lastName,
             email,
+            password: bcrypt.hashSync(
+              A + profile?.displayName.split(" ")[1] + profile.id,
+              10
+            ),
             isActive: true,
           });
           await user.save();
         }
 
-        const accessInfo = {
-          key: process.env.ACCESS_KEY,
-          time: process.env.ACCESS_EXP || "30m",
-          data: {
-            id: user.id,
-            email: user.email,
-            isActive: true,
-            isAdmin: false,
-          },
-        };
-        const accessToken = jwt.sign(accessInfo.data, accessInfo.key, {
-          expiresIn: accessInfo.time,
-        });
+        const { tokenData, accessToken, refreshToken } =
+          await generateAllTokens(user);
 
-        const refreshInfo = {
-          key: process.env.REFRESH_KEY,
-          time: process.env.REFRESH_EXP || "3d",
-          data: {
-            id: user.id,
-          },
-        };
-        const refreshToken = jwt.sign(refreshInfo.data, refreshInfo.key, {
-          expiresIn: refreshInfo.time,
-        });
-
-        done(null, { user, accessToken, refreshToken });
+        return done(null, { user, accessToken, tokenData, refreshToken });
       } catch (err) {
         done(err, null);
       }

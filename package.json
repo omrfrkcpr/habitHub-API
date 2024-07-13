@@ -18,6 +18,7 @@
   "homepage": "https://github.com/omrfrkcpr/habitHub_API#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",

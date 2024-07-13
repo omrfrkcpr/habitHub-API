@@ -11,7 +11,7 @@ const tokenVerificationSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    createdAt: { type: Date, default: Date.now, expires: "7d" }, // will be auitomatically deleted after 7 day, if user doesnt verify
+    createdAt: { type: Date, default: Date.now, expires: "1h" }, // will be auitomatically deleted after 1 hour, if user doesnt verify
   },
   { collection: "tokenVerifications" }
 );
@@ -21,7 +21,7 @@ tokenVerificationSchema.post("findOneAndDelete", async function (doc) {
   if (doc) {
     const user = await User.findById(doc.userId);
     if (user && !user.isActive) {
-      // If user doesnt verify his account in 7 days. Token and User informations will be deleted from database.
+      // If user doesnt verify his account in 1 hour. Token and User informations will be deleted from database.
       await User.findByIdAndDelete(doc.userId);
     }
   }

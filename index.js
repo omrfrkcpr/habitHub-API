@@ -3,6 +3,7 @@
 require("express-async-errors");
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 const session = require("express-session");
@@ -42,6 +43,9 @@ app.use(passport.session());
 
 // Accept JSON:
 app.use(express.json());
+
+// Use cookie-parser middleware
+app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: false }));
 
