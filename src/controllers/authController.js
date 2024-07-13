@@ -139,8 +139,8 @@ module.exports = {
     });
   },
   socialLogin: async (req, res) => {
-    if (req.isAuthenticated() && res.user) {
-      const user = res.user;
+    if (req.isAuthenticated() && req.user) {
+      const user = req.user;
 
       //^ Simple Token
       const tokenData = await Token.create({
@@ -187,7 +187,7 @@ module.exports = {
         user,
       });
       // Kullanıcıyı yönlendirme
-      res.redirect("http://127.0.0.1:3000/contract");
+      // res.redirect("http://127.0.0.1:3000/contract");
     } else {
       res.status(401).send({
         error: true,
@@ -290,9 +290,16 @@ module.exports = {
       const user = await User.findOne({ email });
       // console.log("User found:", user);
 
+      if (!user) {
+        throw new CustomError(
+          "Wrong email or password. Please try to register or login again!",
+          401
+        );
+      }
+
       const isPasswordValid = bcrypt.compareSync(password, user.password);
       // console.log("Password validation result:", isPasswordValid);
-      if (user && isPasswordValid) {
+      if (isPasswordValid) {
         if (user.isActive) {
           //^ SIMPLE TOKEN
           let tokenData = await Token.findOne({

@@ -23,7 +23,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `http://127.0.0.1:8000/auth/google/callback`,
+      callbackURL: `/auth/google/callback`,
     },
     async (token, tokenSecret, profile, done) => {
       try {
@@ -51,7 +51,7 @@ passport.use(
     {
       clientID: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      callbackURL: `http://127.0.0.1:8000/auth/facebook/callback`,
+      callbackURL: `/auth/facebook/callback`,
       profileFields: ["id", "emails", "name"],
     },
     async (token, tokenSecret, profile, done) => {
@@ -83,11 +83,11 @@ passport.use(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: `http://127.0.0.1:8000/auth/github/callback`,
+      callbackURL: `/auth/github/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ githubId: profile.id });
+        let user = await User.findOne({ email: profile.emails[0].value });
 
         if (!user) {
           const firstName = profile.displayName
@@ -148,7 +148,7 @@ passport.use(
     {
       consumerKey: process.env.TWITTER_CLIENT_ID,
       consumerSecret: process.env.TWITTER_CLIENT_SECRET,
-      callbackURL: `http://127.0.0.1:8000/auth/twitter/callback`,
+      callbackURL: `/auth/twitter/callback`,
     },
     async (token, tokenSecret, profile, done) => {
       try {
@@ -173,7 +173,3 @@ passport.use(
     }
   )
 );
-
-// Initialize Passport and restore authentication state if available
-passport.initialize();
-passport.session();
