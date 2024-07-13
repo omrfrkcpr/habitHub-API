@@ -36,9 +36,10 @@
       }
       .content p {
         line-height: 1.6;
+        margin-top: 1rem;
       }
       .content a {
-        color: #007bff;
+        color: #ca87f4;
         text-decoration: none;
       }
       .content a:hover {
@@ -76,7 +77,13 @@
           below:
         </p>
         <p>
-          <a href="http://127.0.0.1:8000/verify-email?token={{token}}"
+          <a
+            href="http://127.0.0.1:8000/verify-email?token={{token}}"
+            background-color: #ca87f4;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
             >Verify Email Address</a
           >
         </p>
@@ -93,12 +100,18 @@
         <p>
           If you have any questions or need assistance, feel free to reply to
           this email or visit our
-          <a href="http://127.0.0.1:8000/">Support Center</a>.
+          <a href="mailto:e.habithub@gmail.com">Support Center</a>
         </p>
         <p>
           Thank you for choosing HabitHub. We look forward to helping you
           achieve your goals!
         </p>
+        <img
+          src="../../../../app-logo.png"
+          alt="habithub-logo"
+          width="30px"
+          height="30px"
+        />
         <p>Best regards,</p>
         <p>The HabitHub Team</p>
       </div>
