@@ -54,13 +54,13 @@ router.get(
 router.get(
   "/google",
   passport.authenticate("google", {
-    session: false,
     scope: ["profile", "email"],
   })
 );
 router.get(
   "/google/callback",
   passport.authenticate("google", {
+    session: true,
     successRedirect: "http://localhost:3000/contract",
     failureRedirect: "http://localhost:3000/signin",
   }),
