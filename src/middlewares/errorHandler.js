@@ -3,7 +3,7 @@
 // app.use(errorHandler)
 
 module.exports = (err, req, res, next) => {
-  console.error(err.message);
+  console.error(err);
   const statusCode = err.statusCode || 500;
   res.status(statusCode).send({
     error: true,

@@ -24,7 +24,7 @@ const {
   generateRefreshToken,
   generateAllTokens,
 } = require("../helpers/tokenGenerator");
-const setDataToCookie = require("../helpers/setDataToCookie");
+
 
 module.exports = {
   register: async (req, res) => {
@@ -113,7 +113,16 @@ module.exports = {
     if (req.user) {
       const { user, tokenData, accessToken, refreshToken } = req.user;
 
-      setTokensCookies(res, tokenData, accessToken, refreshToken, user);
+      res.status(200).send({
+        error: false,
+        message: "You are successfully logged in!",
+        bearer: {
+          access: accessToken,
+          refresh: refreshToken,
+        },
+        token: tokenData.token,
+        user,
+      });
     } else {
       res.status(401).send({
         error: true,
