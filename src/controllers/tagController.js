@@ -1,5 +1,6 @@
 "use strict";
 
+const { CustomError } = require("../errors/customError");
 const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
 
@@ -58,6 +59,12 @@ module.exports = {
     const userId = req.user.isAdmin
       ? req.body.userId // userId must be provided in the request body by an admin
       : req.user?._id || req.user?.id;
+
+    const existingName = await Tag.findOne({ name, userId });
+
+    if (existingName) {
+      throw new CustomError("Tag already exists", 403);
+    }
 
     const tag = new Tag({ name, userId });
     await tag.save();
