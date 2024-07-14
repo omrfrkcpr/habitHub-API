@@ -14,7 +14,7 @@ const idValidation = require("../middlewares/idValidation");
 
 // BASE_URL = /tags
 
-router.route("/").all(isLogin).get(listTags).get(listTagTodos).post(createTag);
+router.route("/").all(isLogin).get(listTags).post(createTag);
 router
   .route("/:id")
   .all(idValidation("Tag"), isTagOwnerOrAdmin)
@@ -22,5 +22,7 @@ router
   .put(updateTag)
   .patch(updateTag)
   .delete(destroyTag);
+
+router.get("/:id/todos", listTagTodos);
 
 module.exports = router;
