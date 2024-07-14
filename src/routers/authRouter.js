@@ -12,7 +12,6 @@ const {
   socialLogin,
 } = require("../controllers/authController");
 const passport = require("passport");
-const { CustomError } = require("../errors/customError");
 
 // BASE_URL: /auth
 

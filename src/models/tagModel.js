@@ -4,7 +4,7 @@ const { mongoose } = require("../configs/dbConnection");
 
 const TagSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
