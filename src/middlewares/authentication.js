@@ -30,7 +30,7 @@ module.exports = async (req, res, next) => {
     } else if (tokenKey[0] == "Bearer") {
       // JWT:
       const token = tokenKey[1];
-      const blacklisted = await TokenBlacklist.findOne({ token: token });
+      const blacklisted = await TokenBlacklist.findOne({ token });
 
       if (blacklisted) {
         req.user = false;
@@ -39,7 +39,7 @@ module.exports = async (req, res, next) => {
 
       jwt.verify(token, process.env.ACCESS_KEY, (error, accessData) => {
         if (accessData) {
-          console.log("JWT verified");
+          // console.log("JWT verified");
           req.user = accessData;
         } else {
           console.log("JWT failed to verify:", error);
