@@ -485,14 +485,14 @@ module.exports = {
       );
 
       if (refreshData) {
-        const { id, password } = refreshData;
+        const { id } = refreshData;
 
-        // Check if id and password exist in token data
-        if (id && password) {
+        // Check if id exist in token data
+        if (id) {
           // Find the user by id in the database
           const user = await User.findOne({ _id: id });
 
-          if (user && user.password === password) {
+          if (user) {
             // Check if the user is active
             if (user.isActive) {
               // Generate a new JWT access token
