@@ -7,17 +7,17 @@ const UserSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
       trim: true,
-      minlength: [3, "Firstname must be at least 3 characters"],
-      maxlength: [20, "Firstname should not contain more than 20 characters"],
+      // required: true,
+      // minlength: [3, "Firstname must be at least 3 characters"],
+      // maxlength: [20, "Firstname should not contain more than 20 characters"],
     },
     lastName: {
       type: String,
-      required: true,
       trim: true,
-      minlength: [3, "Lastname must be at least 3 characters"],
-      maxlength: [20, "Lastname should not contain more than 20 characters"],
+      // required: true,
+      // minlength: [3, "Lastname must be at least 3 characters"],
+      // maxlength: [20, "Lastname should not contain more than 20 characters"],
     },
     email: {
       type: String,
@@ -44,6 +44,8 @@ const UserSchema = new mongoose.Schema(
     facebookId: String,
     googleId: String,
     githubId: String,
+    username: String,
+    avatar: String,
     isActive: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
   },

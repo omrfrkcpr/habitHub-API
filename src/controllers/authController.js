@@ -110,13 +110,17 @@ module.exports = {
     });
   },
   socialLogin: async (req, res) => {
-    console.log(
-      JSON.parse(Object.values(req?.sessionStore?.sessions)[0])?.passport?.user
-    );
+    // console.log(
+    //   JSON.parse(Object.values(req?.sessionStore?.sessions)[0])?.passport?.user
+    // );
     const sessionData = JSON.parse(Object.values(req.sessionStore.sessions)[0])
       .passport.user;
 
     const { accessToken, user, tokenData, refreshToken } = sessionData;
+
+    console.log(accessToken);
+    console.log(user);
+
     if (accessToken && user && refreshToken && tokenData) {
       res.status(200).send({
         error: false,

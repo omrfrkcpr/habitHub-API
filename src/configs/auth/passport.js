@@ -15,7 +15,8 @@ passport.use(
       callbackURL: `/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
-      // console.log("Profile", profile)
+      console.log("Google Profile: ", profile);
+
       try {
         let user = await User.findOne({ email: profile.emails[0].value });
         if (!user) {
@@ -24,16 +25,24 @@ passport.use(
             firstName: profile.name.givenName,
             lastName: profile.name.familyName,
             email: profile.emails[0].value,
+            avatar: profile.photos[0].value,
             password: bcrypt.hashSync(
-              A + profile.name.familyName + profile.id,
+              "A" + profile.name.familyName + profile.id,
               10
             ),
-            isActive: true,
+            isActive: profile?.emails[0]?.verified ? true : false,
           });
           await user.save();
+        } else {
+          // change avatar url of existing user
+          await User.updateOne(
+            { email: profile.emails[0].value },
+            { avatar: profile.photos[0].value }
+          );
         }
 
-        console.log(user);
+        user = await User.findOne({ email: profile.emails[0].value });
+        // console.log(user);
 
         const { tokenData, accessToken, refreshToken } =
           await generateAllTokens(user);
@@ -55,13 +64,14 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log(profile._json);
-        const { firstName, lastName } = getName(profile._json.name);
+        console.log("Github Profile: ", profile);
+        // console.log(profile._json);
+        const { firstName, lastName } = getName(profile._json?.name);
 
         let user = await User.findOne({
           $or: [
-            { email: profile._json?.email },
             { githubId: profile._json?.id },
+            { email: profile._json?.email },
             { firstName },
             { lastName },
           ],
@@ -70,18 +80,45 @@ passport.use(
         if (!user) {
           const email = profile._json?.email
             ? profile._json?.email
-            : `${profile?.username}@github.com`;
+            : `${profile._json?.login}@github.com`;
 
           user = new User({
             githubId: profile._json?.id,
-            firstName,
-            lastName,
+            firstName: firstName || "",
+            lastName: lastName || "",
+            avatar: profile._json?.avatar_url,
             email,
-            password: bcrypt.hashSync(A + lastName + profile._json?.id, 10),
+            username: profile._json?.login,
+            password: bcrypt.hashSync(
+              "A" + (lastName || profile._json?.login) + profile._json?.id,
+              10
+            ),
             isActive: true,
           });
           await user.save();
+        } else {
+          await User.updateOne(
+            {
+              $or: [
+                { githubId: profile._json?.id },
+                { email: profile._json?.email },
+                { firstName },
+                { lastName },
+              ],
+            },
+            { avatar: profile._json?.avatar_url }
+          );
         }
+
+        user = await User.findOne({
+          $or: [
+            { githubId: profile._json?.id },
+            { email: profile._json?.email },
+            { firstName },
+            { lastName },
+          ],
+        });
+        // console.log(user)
 
         const { tokenData, accessToken, refreshToken } =
           await generateAllTokens(user);
@@ -105,22 +142,46 @@ passport.use(
     },
     async (token, tokenSecret, profile, done) => {
       try {
-        console.log(profile);
-        let user = await User.findOne({ twitterId: profile.id });
+        // console.log("Twitter Profile: ", profile)
+        // console.log(profile._json.entities.description);
+        // console.log(profile._json.status.entities);
+
+        let user = await User.findOne({ twitterId: profile._json.id });
         if (!user) {
           user = new User({
-            twitterId: profile.id,
-            firstName: profile.displayName.split(" ")[0],
-            lastName: profile.displayName.split(" ")[1],
-            email: `${profile.username}@twitter.com`, // Twitter'da email yoksa alternatif bir yöntem kullanılıyor
+            twitterId: profile._json.id,
+            email: `${profile._json?.name}@twitter.com`, // If there is no email provided, we will use the username
+            username: profile._json?.name,
+            avatar:
+              profile._json?.profile_image_url_https ||
+              profile._json?.profile_image_url,
+            password: bcrypt.hashSync(
+              "A" + profile._json?.name + profile._json?.id,
+              10
+            ),
             isActive: true,
           });
           await user.save();
         } else {
-          user.twitterId = profile.id;
-          await user.save();
+          await User.updateOne(
+            { twitterId: profile._json.id },
+            {
+              avatar:
+                profile._json?.profile_image_url_https ||
+                profile._json?.profile_image_url,
+            }
+          );
         }
-        return done(null, user);
+
+        user = await User.findOne({ twitterId: profile._json.id });
+        // console.log(user)
+
+        const { tokenData, accessToken, refreshToken } =
+          await generateAllTokens(user);
+
+        const data = { user, accessToken, tokenData, refreshToken };
+
+        return done(null, data);
       } catch (err) {
         return done(err, null);
       }
