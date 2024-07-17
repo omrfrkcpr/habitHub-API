@@ -9,7 +9,6 @@ const {
   forgot,
   verifyEmail,
   logout,
-  socialLogin,
 } = require("../controllers/authController");
 const passport = require("passport");
 

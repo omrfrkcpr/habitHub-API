@@ -5,6 +5,7 @@ const TwitterStrategy = require("passport-twitter").Strategy;
 const User = require("../../models/userModel");
 const bcrypt = require("bcrypt");
 const { generateAllTokens } = require("../../helpers/tokenGenerator");
+const { getName } = require("../../helpers/getSocialData");
 
 passport.use(
   new GoogleStrategy(
@@ -54,28 +55,29 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ email: profile?.emails[0]?.value });
+        console.log(profile._json);
+        const { firstName, lastName } = getName(profile._json.name);
+
+        let user = await User.findOne({
+          $or: [
+            { email: profile._json?.email },
+            { githubId: profile._json?.id },
+            { firstName },
+            { lastName },
+          ],
+        });
 
         if (!user) {
-          const firstName = profile?.displayName
-            ? profile.displayName.split(" ")[0]
-            : "";
-          const lastName = profile?.displayName
-            ? profile.displayName.split(" ")[1]
-            : "";
-          const email = profile?.emails
-            ? profile?.emails[0]?.value
+          const email = profile._json?.email
+            ? profile._json?.email
             : `${profile?.username}@github.com`;
 
           user = new User({
-            githubId: profile.id,
+            githubId: profile._json?.id,
             firstName,
             lastName,
             email,
-            password: bcrypt.hashSync(
-              A + profile?.displayName.split(" ")[1] + profile.id,
-              10
-            ),
+            password: bcrypt.hashSync(A + lastName + profile._json?.id, 10),
             isActive: true,
           });
           await user.save();
@@ -103,6 +105,7 @@ passport.use(
     },
     async (token, tokenSecret, profile, done) => {
       try {
+        console.log(profile);
         let user = await User.findOne({ twitterId: profile.id });
         if (!user) {
           user = new User({
