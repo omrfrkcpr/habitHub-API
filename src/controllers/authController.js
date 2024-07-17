@@ -111,9 +111,14 @@ module.exports = {
   },
   socialLogin: async (req, res) => {
     // if (req.isAuthenticated() && req.user)
-    if (req.user) {
-      const { user, tokenData, accessToken, refreshToken } = req.user;
+    console.log(
+      JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport.user
+    );
+    const sessionData = JSON.parse(Object.values(req.sessionStore.sessions)[0])
+      .passport.user;
 
+    const { accessToken, user, tokenData, refreshToken } = sessionData;
+    if (accessToken && user && refreshToken && tokenData) {
       res.status(200).send({
         error: false,
         message: "You are successfully logged in!",

@@ -32,6 +32,8 @@ passport.use(
           await user.save();
         }
 
+        console.log(user);
+
         const { tokenData, accessToken, refreshToken } =
           await generateAllTokens(user);
 
@@ -82,7 +84,9 @@ passport.use(
         const { tokenData, accessToken, refreshToken } =
           await generateAllTokens(user);
 
-        return done(null, { user, accessToken, tokenData, refreshToken });
+        const data = { user, accessToken, tokenData, refreshToken };
+
+        return done(null, data);
       } catch (err) {
         done(err, null);
       }
@@ -122,13 +126,13 @@ passport.use(
 );
 
 // function to serialize a user/profile object into the session
-passport.serializeUser(function (user, done) {
-  done(null, user);
+passport.serializeUser(function (data, done) {
+  done(null, data);
 });
 
 // function to deserialize a user/profile object into the session
-passport.deserializeUser(async (obj, done) => {
-  done(null, obj);
+passport.deserializeUser(async (data, done) => {
+  done(null, data);
   // try {
   //   const user = await User.findById(id);
   //   done(null, user);

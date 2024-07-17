@@ -31,8 +31,7 @@ router.get(
   passport.authenticate("twitter", {
     successRedirect: "http://localhost:3000/contract",
     failureRedirect: "http://localhost:3000/signin",
-  }),
-  socialLogin
+  })
 );
 
 // Facebook authentication routes
@@ -45,8 +44,7 @@ router.get(
   passport.authenticate("facebook", {
     successRedirect: "http://localhost:3000/contract",
     failureRedirect: "http://localhost:3000/signin",
-  }),
-  socialLogin
+  })
 );
 
 // Google authentication routes
@@ -62,8 +60,7 @@ router.get(
     session: true,
     successRedirect: "http://localhost:3000/contract",
     failureRedirect: "http://localhost:3000/signin",
-  }),
-  socialLogin
+  })
 );
 
 // // GitHub authentication routes
@@ -91,7 +88,7 @@ router.get(
 //       });
 
 //       // Kullanıcıyı frontend'de yönlendirme işlemini de yapabilirsiniz
-//       // res.redirect("http://localhost:3000/contract");
+//       // res.redirect("http://localhost:3000/signin");
 //     });
 //   })(req, res, next);
 // });
@@ -101,10 +98,9 @@ router.get("/github", passport.authenticate("github"));
 router.get(
   "/github/callback",
   passport.authenticate("github", {
-    successRedirect: "http://localhost:3000/contract",
+    successRedirect: "http://localhost:3000/signin",
     failureRedirect: "http://localhost:3000/signin",
-  }),
-  socialLogin
+  })
 );
 
 module.exports = router;

@@ -5,6 +5,7 @@ const express = require("express");
 const app = express();
 const session = require("express-session");
 require("dotenv").config();
+const router = require("express").Router();
 
 const passport = require("passport");
 
@@ -17,6 +18,7 @@ connectDB();
 
 // CORS Configs
 const cors = require("cors");
+const { socialLogin } = require("./src/controllers/authController");
 const corsOptions = {
   origin: [
     process.env.CLIENT_URL,
@@ -51,6 +53,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // Logger:
 // app.use(require("./src/middlewares/logger"));
+
+router.get("/auth/login/success", socialLogin);
+app.use(router);
 
 // Auhentication:
 app.use(require("./src/middlewares/authentication"));
