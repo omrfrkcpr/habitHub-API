@@ -30,7 +30,7 @@ router.get(
   "/twitter/callback",
   passport.authenticate("twitter", {
     successRedirect: "http://localhost:3000/auth/success?auth=twitter",
-    failureRedirect: "http://localhost:3000/signin",
+    failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
 
@@ -43,7 +43,7 @@ router.get(
   "/facebook/callback",
   passport.authenticate("facebook", {
     successRedirect: "http://localhost:3000/auth/success?auth=facebook",
-    failureRedirect: "http://localhost:3000/signin",
+    failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
 
@@ -59,7 +59,7 @@ router.get(
   passport.authenticate("google", {
     session: true,
     successRedirect: "http://localhost:3000/auth/success?auth=google",
-    failureRedirect: "http://localhost:3000/signin",
+    failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
 
@@ -69,7 +69,7 @@ router.get(
   "/github/callback",
   passport.authenticate("github", {
     successRedirect: "http://localhost:3000/auth/success?auth=github",
-    failureRedirect: "http://localhost:3000/signin",
+    failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
 
