@@ -110,9 +110,8 @@ module.exports = {
     });
   },
   socialLogin: async (req, res) => {
-    // if (req.isAuthenticated() && req.user)
     console.log(
-      JSON.parse(Object.values(req.sessionStore.sessions)[0]).passport.user
+      JSON.parse(Object.values(req?.sessionStore?.sessions)[0])?.passport?.user
     );
     const sessionData = JSON.parse(Object.values(req.sessionStore.sessions)[0])
       .passport.user;
@@ -130,10 +129,7 @@ module.exports = {
         user,
       });
     } else {
-      res.status(401).send({
-        error: true,
-        message: "Authentication failed",
-      });
+      throw new CustomError("Authentication failed!", 401);
     }
   },
   // GET
