@@ -2,6 +2,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const GitHubStrategy = require("passport-github2").Strategy;
 const TwitterStrategy = require("passport-twitter").Strategy;
+const LinkedInStrategy = require("passport-linkedin-oauth2").Strategy;
 const User = require("../../models/userModel");
 const bcrypt = require("bcrypt");
 const { generateAllTokens } = require("../../helpers/tokenGenerator");
@@ -52,6 +53,58 @@ passport.use(
           await generateAllTokens(user);
 
         return done(null, { user, accessToken, tokenData, refreshToken });
+      } catch (err) {
+        return done(err, null);
+      }
+    }
+  )
+);
+
+passport.use(
+  new LinkedInStrategy(
+    {
+      clientID: process.env.LINKEDIN_CLIENT_ID,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+      callbackURL: `/auth/linkedin/callback`,
+      scope: ["r_emailaddress", "r_liteprofile"],
+      state: true,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      console.log("Linkedin Profile: ", profile);
+
+      try {
+        //   let user = await User.findOne({
+        //     $or: [{ email: profile.emails[0].value }, { linkedinId: profile.id }],
+        //   });
+        //   if (!user) {
+        //     user = new User({
+        //       linkedinId: profile.id,
+        //       firstName: profile.name.givenName,
+        //       lastName: profile.name.familyName,
+        //       email: profile.emails[0].value,
+        //       avatar: profile.photos[0].value,
+        //       password: bcrypt.hashSync(
+        //         "A" + profile.name.familyName + profile.id,
+        //         10
+        //       ),
+        //       isActive: profile?.emails[0]?.verified ? true : false,
+        //     });
+        //     await user.save();
+        //   } else {
+        //     if (user.avatar === "") {
+        //       // change avatar url of existing user
+        //       await User.updateOne(
+        //         { email: profile.emails[0].value },
+        //         { avatar: profile.photos[0].value }
+        //       );
+        //     }
+        //   }
+        //   user = await User.findOne({ email: profile.emails[0].value });
+        //   // console.log(user);
+        //   const { tokenData, accessToken, refreshToken } =
+        //     await generateAllTokens(user);
+        // return done(null, { user, accessToken, tokenData, refreshToken });
+        return done(null, profile);
       } catch (err) {
         return done(err, null);
       }

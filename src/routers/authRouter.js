@@ -33,19 +33,6 @@ router.get(
   })
 );
 
-// // Facebook authentication routes
-// router.get(
-//   "/facebook",
-//   passport.authenticate("facebook", { scope: ["email"] })
-// );
-// router.get(
-//   "/facebook/callback",
-//   passport.authenticate("facebook", {
-//     successRedirect: "http://localhost:3000/auth/success?auth=facebook",
-//     failureRedirect: "http://localhost:3000/auth/failure",
-//   })
-// );
-
 // Google authentication routes
 router.get(
   "/google",
@@ -58,6 +45,20 @@ router.get(
   passport.authenticate("google", {
     session: true,
     successRedirect: "http://localhost:3000/auth/success?auth=google",
+    failureRedirect: "http://localhost:3000/auth/failure",
+  })
+);
+
+// Linkedin authentication routes
+router.get(
+  "/linkedin",
+  passport.authenticate("linkedin", { state: "SOME STATE" })
+);
+router.get(
+  "/linkedin/callback",
+  passport.authenticate("linkedin", {
+    session: true,
+    successRedirect: "http://localhost:3000/auth/success?auth=linkedin",
     failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
