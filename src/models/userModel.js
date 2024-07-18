@@ -61,7 +61,7 @@ UserSchema.set("toJSON", {
   versionKey: false,
   transform: function (doc, ret) {
     delete ret._id;
-    delete ret.password; // Ensure password is not returned
+    // delete ret.password; // Ensure password is not returned
   },
 });
 

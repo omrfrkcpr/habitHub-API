@@ -18,7 +18,9 @@ passport.use(
       console.log("Google Profile: ", profile);
 
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        let user = await User.findOne({
+          $or: [{ email: profile.emails[0].value }, { googleId: profile.id }],
+        });
         if (!user) {
           user = new User({
             googleId: profile.id,
@@ -34,11 +36,13 @@ passport.use(
           });
           await user.save();
         } else {
-          // change avatar url of existing user
-          await User.updateOne(
-            { email: profile.emails[0].value },
-            { avatar: profile.photos[0].value }
-          );
+          if (user.avatar === "") {
+            // change avatar url of existing user
+            await User.updateOne(
+              { email: profile.emails[0].value },
+              { avatar: profile.photos[0].value }
+            );
+          }
         }
 
         user = await User.findOne({ email: profile.emails[0].value });
@@ -97,17 +101,19 @@ passport.use(
           });
           await user.save();
         } else {
-          await User.updateOne(
-            {
-              $or: [
-                { githubId: profile._json?.id },
-                { email: profile._json?.email },
-                { firstName },
-                { lastName },
-              ],
-            },
-            { avatar: profile._json?.avatar_url }
-          );
+          if (user.avatar === "") {
+            await User.updateOne(
+              {
+                $or: [
+                  { githubId: profile._json?.id },
+                  { email: profile._json?.email },
+                  { firstName },
+                  { lastName },
+                ],
+              },
+              { avatar: profile._json?.avatar_url }
+            );
+          }
         }
 
         user = await User.findOne({
@@ -163,14 +169,16 @@ passport.use(
           });
           await user.save();
         } else {
-          await User.updateOne(
-            { twitterId: profile._json.id },
-            {
-              avatar:
-                profile._json?.profile_image_url_https ||
-                profile._json?.profile_image_url,
-            }
-          );
+          if (user.avatar === "") {
+            await User.updateOne(
+              { twitterId: profile._json.id },
+              {
+                avatar:
+                  profile._json?.profile_image_url_https ||
+                  profile._json?.profile_image_url,
+              }
+            );
+          }
         }
 
         user = await User.findOne({ twitterId: profile._json.id });

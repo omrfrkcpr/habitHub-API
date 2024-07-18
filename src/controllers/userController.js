@@ -7,6 +7,7 @@ const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 const fs = require("node:fs");
+const path = require("path");
 
 module.exports = {
   // GET
@@ -107,11 +108,13 @@ module.exports = {
     // Fetch current user from database
     const user = await User.findOne(customFilter);
 
-    // Compare new password with current hashed password
-    const isSamePassword = bcrypt.compareSync(req.body.password, user.password);
-
     // Check if password is being updated
     if (req.body.password) {
+      // Compare new password with current hashed password
+      const isSamePassword = bcrypt.compareSync(
+        req.body.password,
+        user.password
+      );
       // If new password is different, hash the new password
       if (!isSamePassword) {
         req.body.password = bcrypt.hashSync(req.body.password, 10);

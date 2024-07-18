@@ -64,6 +64,11 @@ module.exports = {
       throw new CustomError("Email already exists!", 400);
     }
 
+    let formattedAvatar = "";
+    if (req.file) {
+      formattedAvatar = "/uploads/" + req.file.filename;
+    }
+
     // Create new user
     user = new User({
       firstName,
@@ -72,6 +77,7 @@ module.exports = {
       password: bcrypt.hashSync(password, 10),
       isActive: false, // user will active his account via verification email
       isAdmin: false,
+      avatar: formattedAvatar,
     });
 
     // Save new user to the database
