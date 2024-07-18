@@ -19,6 +19,10 @@ const UserSchema = new mongoose.Schema(
       // minlength: [3, "Lastname must be at least 3 characters"],
       // maxlength: [20, "Lastname should not contain more than 20 characters"],
     },
+    avatar: {
+      type: String,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,

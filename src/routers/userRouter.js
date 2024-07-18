@@ -10,16 +10,20 @@ const {
 } = require("../controllers/userController");
 const { isAdmin, isAdminOrOwn } = require("../middlewares/permissions");
 const idValidation = require("../middlewares/idValidation");
+const upload = require("../middlewares/upload");
 
 // BASE_URL: /users
 
-router.route("/").get(isAdmin, listUsers).post(createUser);
+router
+  .route("/")
+  .get(isAdmin, listUsers)
+  .post(upload.single("avatar"), createUser);
 router
   .route("/:id")
   .all(idValidation("User"), isAdminOrOwn)
   .get(readUser)
-  .put(updateUser)
-  .patch(updateUser)
+  .put(upload.single("avatar"), updateUser)
+  .patch(upload.single("avatar"), updateUser)
   .delete(destroyUser);
 
 module.exports = router;

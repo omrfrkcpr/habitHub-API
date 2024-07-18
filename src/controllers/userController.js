@@ -6,6 +6,7 @@ const Token = require("../models/tokenModel");
 const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
+const fs = require("node:fs");
 
 module.exports = {
   // GET
@@ -61,6 +62,10 @@ module.exports = {
       await User.updateMany({ isAdmin: true }, { isAdmin: false });
     }
 
+    if (req.file) {
+      req.body.avatar = "/uploads/" + req.file.filename;
+    }
+
     // Create new user in database
     const data = await User.create({
       ...req.body,
@@ -90,41 +95,46 @@ module.exports = {
       - Returns a success message along with the updated user data.
     */
 
-    const filters = req.user?.isAdmin
+    const customFilter = req.user?.isAdmin
       ? { _id: req.params.id }
       : { _id: req.user?._id || req.user?.id };
-    req.body.isAdmin = req.user?.isAdmin || false;
+
+    if (!req.user.isAdmin) {
+      delete req.body.isActive;
+      delete req.body.isAdmin;
+    }
+
+    // Fetch current user from database
+    const user = await User.findOne(customFilter);
+
+    // Compare new password with current hashed password
+    const isSamePassword = bcrypt.compareSync(req.body.password, user.password);
 
     // Check if password is being updated
     if (req.body.password) {
-      // Fetch current user from database
-      const user = await User.findOne(filters);
-      if (!user) {
-        return res.status(404).send({
-          error: true,
-          message: "User not found",
-        });
-      }
-
-      // Compare new password with current hashed password
-      const isSamePassword = bcrypt.compareSync(
-        req.body.password,
-        user.password
-      );
-
       // If new password is different, hash the new password
       if (!isSamePassword) {
         req.body.password = bcrypt.hashSync(req.body.password, 10);
       }
     }
 
-    const data = await User.updateOne(filters, req.body, {
+    if (req.file) {
+      req.body.avatar = "/uploads/" + req.file.filename;
+    }
+
+    const data = await User.findOneAndUpdate(customFilter, req.body, {
       runValidators: true,
-    });
+    }); // returns data
+
+    // delete old uploaded image
+    if (req.file && data.avatar) {
+      fs.unlinkSync(`.${data.avatar}`, (err) => console.log(err));
+    }
+
     res.status(202).send({
       error: false,
-      message: "Account successfully updated",
-      new: await User.find(filters),
+      message: "Your changes have been saved successfully.",
+      new: await User.findOne(customFilter),
       data,
     });
   },
@@ -137,10 +147,10 @@ module.exports = {
       - Returns a response indicating success or failure of the deletion operation along with relevant messages.
     */
 
-    const isFilter = req.user?.isAdmin
+    const idFilter = req.user?.isAdmin
       ? { _id: req.params.id }
       : { _id: req.user?._id || req.user?.id };
-    //console.log("isFilter":, isFilter);
+    //console.log("idFilter":, idFilter);
 
     const userIdFilter = req.user?.isAdmi
       ? { userId: req.params.id }
@@ -151,14 +161,16 @@ module.exports = {
     await Tag.deleteMany(userIdFilter);
 
     // Delete user
-    const result = await User.deleteOne(isFilter);
+    const result = await User.findOneAndDelete(idFilter); // returns data
 
-    res.status(result.deletedCount ? 204 : 404).send({
-      error: !result.deletedCount,
-      message: result.deletedCount
-        ? "The user has been successfully deleted along with all Todos and Tags associated with this user."
-        : "User not found",
-      data: result,
+    // delete old uploaded image
+    if (result.avatar) {
+      fs.unlinkSync(`.${result.avatar}`, (err) => console.log(err));
+    }
+
+    res.status(204).send({
+      error: false,
+      message: "Account successfully deleted!",
     });
   },
 };
