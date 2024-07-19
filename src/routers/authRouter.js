@@ -52,7 +52,10 @@ router.get(
 // Linkedin authentication routes
 router.get(
   "/linkedin",
-  passport.authenticate("linkedin", { state: "SOME STATE" })
+  passport.authenticate("linkedin", {
+    state: "WESDFSDGAGFSDFDSF",
+    // passReqToCallback: true,
+  })
 );
 router.get(
   "/linkedin/callback",

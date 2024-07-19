@@ -48,6 +48,7 @@ const UserSchema = new mongoose.Schema(
     facebookId: String,
     googleId: String,
     githubId: String,
+    linkedinId: String,
     username: String,
     avatar: String,
     isActive: { type: Boolean, default: false },

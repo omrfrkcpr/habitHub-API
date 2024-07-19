@@ -66,45 +66,41 @@ passport.use(
       clientID: process.env.LINKEDIN_CLIENT_ID,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
       callbackURL: `/auth/linkedin/callback`,
-      scope: ["r_emailaddress", "r_liteprofile"],
+      scope: ["profile"],
       state: true,
     },
     async (accessToken, refreshToken, profile, done) => {
       console.log("Linkedin Profile: ", profile);
-
       try {
-        //   let user = await User.findOne({
-        //     $or: [{ email: profile.emails[0].value }, { linkedinId: profile.id }],
-        //   });
-        //   if (!user) {
-        //     user = new User({
-        //       linkedinId: profile.id,
-        //       firstName: profile.name.givenName,
-        //       lastName: profile.name.familyName,
-        //       email: profile.emails[0].value,
-        //       avatar: profile.photos[0].value,
-        //       password: bcrypt.hashSync(
-        //         "A" + profile.name.familyName + profile.id,
-        //         10
-        //       ),
-        //       isActive: profile?.emails[0]?.verified ? true : false,
-        //     });
-        //     await user.save();
-        //   } else {
-        //     if (user.avatar === "") {
-        //       // change avatar url of existing user
-        //       await User.updateOne(
-        //         { email: profile.emails[0].value },
-        //         { avatar: profile.photos[0].value }
-        //       );
-        //     }
+        let user = await User.findOne({
+          $or: [{ email: profile.email }, { linkedinId: profile.sub }],
+        });
+        if (!user) {
+          user = new User({
+            linkedinId: profile.sub,
+            firstName: profile.given_name,
+            lastName: profile.family_name,
+            email: profile.email,
+            avatar: profile.picture,
+            password: bcrypt.hashSync("A" + lastName + profile.sub, 10),
+            isActive: profile.email_verified ? true : false,
+          });
+          await user.save();
+        }
+        // else {
+        //   if (user.avatar === "") {
+        //     // change avatar url of existing user
+        //     await User.updateOne(
+        //       { email: profile.emails[0].value },
+        //       { avatar: profile.photos[0].value }
+        //     );
         //   }
-        //   user = await User.findOne({ email: profile.emails[0].value });
-        //   // console.log(user);
-        //   const { tokenData, accessToken, refreshToken } =
-        //     await generateAllTokens(user);
-        // return done(null, { user, accessToken, tokenData, refreshToken });
-        return done(null, profile);
+        // }
+        user = await User.findOne({ email: profile.email });
+        // console.log(user);
+        const { tokenData, accessToken, refreshToken } =
+          await generateAllTokens(user);
+        return done(null, { user, accessToken, tokenData, refreshToken });
       } catch (err) {
         return done(err, null);
       }
