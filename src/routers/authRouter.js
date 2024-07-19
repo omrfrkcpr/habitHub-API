@@ -49,23 +49,6 @@ router.get(
   })
 );
 
-// Linkedin authentication routes
-router.get(
-  "/linkedin",
-  passport.authenticate("linkedin", {
-    state: "WESDFSDGAGFSDFDSF",
-    // passReqToCallback: true,
-  })
-);
-router.get(
-  "/linkedin/callback",
-  passport.authenticate("linkedin", {
-    session: true,
-    successRedirect: "http://localhost:3000/auth/success?auth=linkedin",
-    failureRedirect: "http://localhost:3000/auth/failure",
-  })
-);
-
 // GitHub authentication routes
 router.get("/github", passport.authenticate("github"));
 router.get(
