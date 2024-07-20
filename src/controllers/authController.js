@@ -390,15 +390,16 @@ module.exports = {
 
     const refreshToken = token;
 
-    console.log("Email:", email); // Debugging
-    console.log("New Password:", newPassword); // Debugging
-    console.log("Refresh Token:", refreshToken); // Debugging
+    // console.log("Email:", email); // Debugging
+    // console.log("New Password:", newPassword); // Debugging
+    // console.log("Refresh Token:", refreshToken); // Debugging
 
     if (email && newPassword && refreshToken) {
       // Validate the new password
-      const isStrong = validator.isStrongPassword(newPassword, [
-        { minLength: 6, symbols: "@!#$%" },
-      ]);
+      const isStrong = validator.isStrongPassword(newPassword, {
+        minLength: 6,
+        minSymbols: 1,
+      });
 
       if (!isStrong) {
         throw new CustomError(

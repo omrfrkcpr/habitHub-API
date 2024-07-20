@@ -7,7 +7,7 @@ const Tag = require("../models/tagModel");
 const Todo = require("../models/todoModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 const fs = require("node:fs");
-const path = require("path");
+const validator = require("validator");
 
 module.exports = {
   // GET
@@ -110,6 +110,38 @@ module.exports = {
 
     // Check if password is being updated
     if (req.body.password) {
+      const oldPassword = req.body.oldPassword;
+
+      if (!oldPassword) {
+        throw new CustomError(
+          "Current Password is required to update password",
+          400
+        );
+      } else {
+        // Check if old password is correct
+        const isCorrectPassword = bcrypt.compareSync(
+          oldPassword,
+          user.password
+        );
+        if (!isCorrectPassword) {
+          throw new CustomError(
+            "Please provide correct current password!",
+            401
+          );
+        }
+      }
+
+      const isStrong = validator.isStrongPassword(req.body.password, {
+        minLength: 6,
+        minSymbols: 1,
+      });
+
+      if (!isStrong) {
+        throw new CustomError(
+          "Invalid Password. Please provide a valid password",
+          400
+        );
+      }
       // Compare new password with current hashed password
       const isSamePassword = bcrypt.compareSync(
         req.body.password,
@@ -123,6 +155,10 @@ module.exports = {
 
     if (req.file) {
       req.body.avatar = "/uploads/" + req.file.filename;
+    }
+
+    if (req.body.oldPassword) {
+      delete req.body.oldPassword; // requires just for security and user notifications
     }
 
     const data = await User.findOneAndUpdate(customFilter, req.body, {
