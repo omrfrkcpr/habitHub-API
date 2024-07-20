@@ -4,7 +4,7 @@ const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const Token = require("../models/tokenModel");
 const Tag = require("../models/tagModel");
-const Todo = require("../models/todoModel");
+const Task = require("../models/taskModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 const fs = require("node:fs");
 const validator = require("validator");
@@ -197,7 +197,7 @@ module.exports = {
   destroyUser: async (req, res) => {
     /*
       - Determines the filter based on whether the requesting user (req.user) is an admin.
-      - Deletes todos and tags associated with the user using Todo.deleteMany() and Tag.deleteMany().
+      - Deletes tasks and tags associated with the user using Task.deleteMany() and Tag.deleteMany().
       - Deletes the user from the database using User.deleteOne().
       - Returns a response indicating success or failure of the deletion operation along with relevant messages.
     */
@@ -211,8 +211,8 @@ module.exports = {
       ? { userId: req.params.id }
       : { userId: req.user?._id || req.user?.id };
 
-    // Delete all todos and tags related to
-    await Todo.deleteMany(userIdFilter);
+    // Delete all tasks and tags related to
+    await Task.deleteMany(userIdFilter);
     await Tag.deleteMany(userIdFilter);
 
     // Delete user

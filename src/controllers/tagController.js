@@ -2,7 +2,7 @@
 
 const { CustomError } = require("../errors/customError");
 const Tag = require("../models/tagModel");
-const Todo = require("../models/todoModel");
+const Task = require("../models/taskModel");
 
 module.exports = {
   // GET
@@ -23,12 +23,12 @@ module.exports = {
     res.status(200).send({ error: false, data: tags });
   },
   // /:id => GET
-  listTagTodos: async (req, res) => {
+  listTagTasks: async (req, res) => {
     /*
-      - Sets the filter to fetch todos associated with a specific tag ID.
-      - If the user is not an admin, adds a condition to the filter to only include todos owned by the user.
-      - Fetches the list of todos from the database using the filter.
-      - Sends the fetched todos and additional details in the response.
+      - Sets the filter to fetch tasks associated with a specific tag ID.
+      - If the user is not an admin, adds a condition to the filter to only include tasks owned by the user.
+      - Fetches the list of tasks from the database using the filter.
+      - Sends the fetched tasks and additional details in the response.
     */
     const listFilter = {
       tagId: req.params.id,
@@ -38,12 +38,12 @@ module.exports = {
       listFilter.userId = req.user?._id || req.user?.id;
     }
 
-    const todos = await res.getModelList(Todo, listFilter);
+    const tasks = await res.getModelList(Task, listFilter);
     // .sort({ priority: -1 }); // from high to low priority
     res.send({
       error: false,
-      details: await res.getModelListDetails(Todo, listFilter),
-      data: todos,
+      details: await res.getModelListDetails(Task, listFilter),
+      data: tasks,
     });
   },
   // POST

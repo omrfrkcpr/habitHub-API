@@ -4,7 +4,7 @@
 /* -------------------------------------------------------------------------- */
 
 const { CustomError } = require("../errors/customError");
-const Todo = require("../models/todoModel");
+const Task = require("../models/taskModel");
 const Tag = require("../models/tagModel");
 
 module.exports = {
@@ -49,12 +49,12 @@ module.exports = {
     }
   },
 
-  isTodoOwnerOrAdmin: async (req, res, next) => {
+  isTaskOwnerOrAdmin: async (req, res, next) => {
     if (req.user && req.user.isActive) {
-      const todo = await Todo.findById(req.params.id);
+      const task = await Task.findById(req.params.id);
       if (
         req.user.isAdmin ||
-        String(todo.userId) === String(req.user.id || req.user._id)
+        String(task.userId) === String(req.user.id || req.user._id)
       ) {
         next();
       } else {

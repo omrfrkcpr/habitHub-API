@@ -3,7 +3,7 @@
 const router = require("express").Router();
 const {
   listTags,
-  listTagTodos,
+  listTagTasks,
   createTag,
   readTag,
   updateTag,
@@ -23,6 +23,6 @@ router
   .patch(updateTag)
   .delete(destroyTag);
 
-router.get("/:id/todos", listTagTodos);
+router.get("/:id/tasks", listTagTasks);
 
 module.exports = router;

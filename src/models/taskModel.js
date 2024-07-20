@@ -2,7 +2,7 @@
 
 const { mongoose } = require("../configs/dbConnection");
 
-const TodoSchema = new mongoose.Schema(
+const TaskSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
@@ -22,10 +22,10 @@ const TodoSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { collection: "todos", timestamps: true }
+  { collection: "tasks", timestamps: true }
 );
 
-TodoSchema.set("toJSON", {
+TaskSchema.set("toJSON", {
   virtuals: true,
   versionKey: false,
   transform: function (doc, ret) {
@@ -33,6 +33,6 @@ TodoSchema.set("toJSON", {
   },
 });
 
-const Todo = mongoose.model("Todo", TodoSchema);
+const Task = mongoose.model("Task", TaskSchema);
 
-module.exports = Todo;
+module.exports = Task;

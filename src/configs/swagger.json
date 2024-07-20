@@ -15,10 +15,7 @@
   },
   "host": "127.0.0.1:8000",
   "basePath": "/",
-  "schemes": [
-    "http",
-    "https"
-  ],
+  "schemes": ["http", "https"],
   "securityDefinitions": {
     "Token": {
       "type": "apiKey",
@@ -27,12 +24,8 @@
       "description": "Simple Token Authentication * Example: <b>Token ...tokenKey...</b>"
     }
   },
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
   "paths": {
     "/auth/register": {
       "post": {
@@ -153,7 +146,7 @@
         }
       }
     },
-    "/todos/": {
+    "/tasks/": {
       "get": {
         "description": "",
         "parameters": [
@@ -213,7 +206,7 @@
         }
       }
     },
-    "/todos/{id}": {
+    "/tasks/{id}": {
       "put": {
         "description": "",
         "parameters": [

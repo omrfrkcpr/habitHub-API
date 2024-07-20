@@ -4,12 +4,12 @@ module.exports = async function () {
   return null;
 
   const Tag = require("../models/tagModel");
-  const Todo = require("../models/todoModel");
+  const Task = require("../models/taskModel");
   const fs = require("fs");
 
   // Load the JSON data
-  const todosData = JSON.parse(
-    fs.readFileSync("./src/helpers/todos.json", "utf-8")
+  const tasksData = JSON.parse(
+    fs.readFileSync("./src/helpers/tasks.json", "utf-8")
   );
 
   const admin_userId = process.env.ADMIN_USERID;
@@ -33,12 +33,12 @@ module.exports = async function () {
     const tags = await Tag.find(); // Fetch all tags to randomly assign one
 
     for (let i = 0; i < 10; i++) {
-      // Creating 10 random todos
-      const randomTodo =
-        todosData[Math.floor(Math.random() * todosData.length)];
-      const todo = new Todo({
-        name: randomTodo.name,
-        description: randomTodo.description,
+      // Creating 10 random tasks
+      const randomTask =
+        tasksData[Math.floor(Math.random() * tasksData.length)];
+      const task = new Task({
+        name: randomTask.name,
+        description: randomTask.description,
         cardColor: "#" + Math.floor(Math.random() * 16777215).toString(16), // Random color
         repeat: "daily",
         priority: Math.floor(Math.random() * 3) - 1, // Random priority between -1 and 1
@@ -49,11 +49,11 @@ module.exports = async function () {
         userId: admin_userId,
       });
 
-      await todo.save();
+      await task.save();
     }
 
-    console.log("Random Todos created successfully!");
+    console.log("Random Tasks created successfully!");
   } catch (error) {
-    console.error("Error creating random Todos:", error);
+    console.error("Error creating random Tasks:", error);
   }
 };
