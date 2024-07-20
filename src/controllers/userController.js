@@ -170,9 +170,25 @@ module.exports = {
       fs.unlinkSync(`.${data.avatar}`, (err) => console.log(err));
     }
 
+    let message;
+
+    if (req.body.password) {
+      message = "Your password has been updated successfully.";
+    } else if (
+      req.body.username ||
+      req.body.email ||
+      req.body.avatar ||
+      req.body.firstName ||
+      req.body.lastName
+    ) {
+      message = "Your profile information has been updated successfully.";
+    } else {
+      message = "Your changes have been saved successfully.";
+    }
+
     res.status(202).send({
       error: false,
-      message: "Your changes have been saved successfully.",
+      message,
       new: await User.findOne(customFilter),
       data,
     });

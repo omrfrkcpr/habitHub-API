@@ -58,6 +58,18 @@ module.exports = {
 
     const { firstName, lastName, email, password } = req.body;
 
+    const isStrong = validator.isStrongPassword(password, {
+      minLength: 6,
+      minSymbols: 1,
+    });
+
+    if (!isStrong) {
+      throw new CustomError(
+        "Invalid Password. Please provide a valid password",
+        400
+      );
+    }
+
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
