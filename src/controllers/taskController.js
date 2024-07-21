@@ -195,7 +195,7 @@ module.exports = {
           $lte: end,
         },
       },
-    });
+    }).sort({ priority: -1 });
 
     if (!tasks.length) {
       throw new CustomError("No tasks found for this date", 404);
