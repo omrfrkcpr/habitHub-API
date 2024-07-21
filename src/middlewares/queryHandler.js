@@ -1,4 +1,6 @@
 "use strict";
+const Task = require("../models/taskModel");
+const Tag = require("../models/tagModel");
 
 module.exports = (req, res, next) => {
   //! Filtering
@@ -41,7 +43,58 @@ module.exports = (req, res, next) => {
       .populate(populate);
   };
   res.getModelListDetails = async (Model, customFilter = {}) => {
-    const data = await Model.find({ ...filter, ...customFilter, ...search });
+    let populate = null;
+
+    // Conditionally set populate
+    if (Model === Task) {
+      populate = [
+        { path: "tagId" }, // Populate 'tagId' for tasks
+      ];
+    }
+
+    const data = await Model.find({
+      ...filter,
+      ...customFilter,
+      ...search,
+    }).populate(populate); // Use populate if defined
+
+    console.log("Fetched data with populated tagId:", data);
+
+    let lists = [];
+    if (Model === Task) {
+      try {
+        const taskGroups = data.reduce((acc, task) => {
+          const tag = task.tagId;
+          if (!tag || !tag._id || !tag.name) {
+            console.warn(
+              `Task with ID ${task._id} has an invalid tagId.`,
+              task.tagId
+            );
+            return acc;
+          }
+          const tagId = tag._id.toString();
+          if (!acc[tagId]) {
+            acc[tagId] = { name: tag.name, count: 0 };
+          }
+          acc[tagId].count++;
+          return acc;
+        }, {});
+
+        console.log("Task groups by tagId:", taskGroups);
+
+        lists = Object.keys(taskGroups)
+          .map((tagId) => ({
+            tagId,
+            name: taskGroups[tagId].name,
+            count: taskGroups[tagId].count,
+          }))
+          .sort((a, b) => b.count - a.count);
+
+        console.log("Sorted lists:", lists);
+      } catch (err) {
+        console.error("Error processing lists:", err);
+      }
+    }
 
     let details = {
       filter,
@@ -50,6 +103,7 @@ module.exports = (req, res, next) => {
       sort,
       skip,
       limit,
+      lists,
       page,
       pages: {
         previous: page > 0 ? page : false,
@@ -62,6 +116,7 @@ module.exports = (req, res, next) => {
     details.pages.next =
       details.pages.next > details.pages.totalPage ? false : details.pages.next;
     if (details.total <= limit) details.pages = false;
+
     return details;
   };
 

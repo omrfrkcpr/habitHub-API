@@ -30,12 +30,38 @@ module.exports = async function () {
   };
 
   try {
-    const tags = await Tag.find(); // Fetch all tags to randomly assign one
+    // Clear the Tag collection
+    await Tag.deleteMany();
+
+    // Create the new tags
+    const dailyRoutineTag = new Tag({
+      name: "Daily Routine",
+      userId: admin_userId,
+    });
+    const workRoutineTag = new Tag({
+      name: "Work Routine",
+      userId: admin_userId,
+    });
+
+    const savedDailyRoutineTag = await dailyRoutineTag.save();
+    const savedWorkRoutineTag = await workRoutineTag.save();
+
+    // Verify tags are saved
+    const tags = await Tag.find(); // Fetch all tags to ensure they are saved
+    console.log("Tags in database:", tags);
+
+    if (tags.length === 0) {
+      throw new Error(
+        "No tags found in the database. Tasks cannot be created."
+      );
+    }
 
     for (let i = 0; i < 10; i++) {
       // Creating 10 random tasks
       const randomTask =
         tasksData[Math.floor(Math.random() * tasksData.length)];
+      const randomTag = tags[Math.floor(Math.random() * tags.length)]; // Randomly select one of the created tags
+
       const task = new Task({
         name: randomTask.name,
         description: randomTask.description,
@@ -43,8 +69,7 @@ module.exports = async function () {
         repeat: "daily",
         priority: Math.floor(Math.random() * 3) - 1, // Random priority between -1 and 1
         dueDates: getRandomDueDates(3), // Generate 3 random due dates
-        // tagId: tags[Math.floor(Math.random() * tags.length)].id, // Random tag
-        // tagId: "6693c8f288bbcd9097817496", // work routine
+        tagId: randomTag._id, // Assign the random tag's _id
         isCompleted: Math.random() < 0.5, // Random boolean
         userId: admin_userId,
       });
