@@ -28,7 +28,7 @@ router.get("/twitter", passport.authenticate("twitter"));
 router.get(
   "/twitter/callback",
   passport.authenticate("twitter", {
-    successRedirect: "http://localhost:3000/auth/success?auth=twitter",
+    successRedirect: "http://localhost:3000/auth/success?provider=twitter",
     failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
@@ -44,7 +44,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: true,
-    successRedirect: "http://localhost:3000/auth/success?auth=google",
+    successRedirect: "http://localhost:3000/auth/success?provider=google",
     failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
@@ -54,7 +54,7 @@ router.get("/github", passport.authenticate("github"));
 router.get(
   "/github/callback",
   passport.authenticate("github", {
-    successRedirect: "http://localhost:3000/auth/success?auth=github",
+    successRedirect: "http://localhost:3000/auth/success?provider=github",
     failureRedirect: "http://localhost:3000/auth/failure",
   })
 );
