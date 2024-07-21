@@ -1,8 +1,11 @@
 "use strict";
 
-const Task = require("../models/taskModel");
 const { parseISO, startOfDay, endOfDay, isValid } = require("date-fns");
 const { CustomError } = require("../errors/customError");
+const User = require("../models/userModel");
+const Task = require("../models/taskModel");
+const { sendEmail } = require("../configs/email/emailService");
+const { getTaskEmailHtml } = require("../configs/email/dailyTasks/dailyTasks");
 
 module.exports = {
   // GET
@@ -161,5 +164,51 @@ module.exports = {
         ? "Task successfully deleted"
         : "Task not found",
     });
+  },
+  // /email => POST
+  sendTasks: async (req, res) => {
+    const { userId, date } = req.body;
+
+    if (!userId || !date) {
+      throw new CustomError("Bad request. Please try again!", 400);
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new CustomError("User not found", 404);
+    }
+
+    const parsedDate = parseISO(date);
+
+    if (!isValid(parsedDate)) {
+      throw new CustomError("Invalid date format", 400);
+    }
+
+    const start = startOfDay(parsedDate);
+    const end = endOfDay(parsedDate);
+
+    const tasks = await Task.find({
+      userId,
+      dueDates: {
+        $elemMatch: {
+          $gte: start,
+          $lte: end,
+        },
+      },
+    });
+
+    if (!tasks.length) {
+      throw new CustomError("No tasks found for this date", 404);
+    }
+
+    const formattedDate = new Date(date).toLocaleDateString("en-GB");
+
+    const emailHtml = getTaskEmailHtml(user.firstName, formattedDate, tasks);
+
+    const emailSubject = `Your tasks for ${formattedDate}`;
+
+    await sendEmail(user.email, emailSubject, emailHtml);
+
+    res.status(200).send({ message: "Email sent successfully" });
   },
 };

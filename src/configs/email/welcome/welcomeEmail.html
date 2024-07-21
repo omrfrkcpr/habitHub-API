@@ -45,6 +45,21 @@
       .content a:hover {
         text-decoration: underline;
       }
+      .company {
+        background-color: white;
+        display: flex;
+        text-align: left;
+        width: fit-content;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+      }
+      .company p {
+        margin: 0;
+      }
       .footer {
         text-align: center;
         padding: 10px 0;
@@ -58,7 +73,7 @@
   <body>
     <div class="container">
       <div class="header">
-        <img src="../../../../../app-logo.png" alt="HabitHub Logo" />
+        <img src="https://media.licdn.com/dms/image/D4E0BAQGjEbyuclAkVQ/company-logo_100_100/0/1721344095827?e=1729728000&v=beta&t=IqB8V-K4rOaY0hSxOaODnzG6ao1RRp-knFiVhqqUtHo" alt="HabitHub Logo" />
       </div>
       <div class="content">
         <h1>Welcome to HabitHub, {{firstName}}!</h1>
@@ -111,14 +126,17 @@
           Thank you for choosing HabitHub. We look forward to helping you
           achieve your goals!
         </p>
-        <img
-          src="../../../../app-logo.png"
-          alt="habithub-logo"
-          width="30px"
-          height="30px"
-        />
-        <p>Best regards,</p>
-        <p>The HabitHub Team</p>
+
+        <div class="company">
+          <img
+            src="https://media.licdn.com/dms/image/D4E0BAQGjEbyuclAkVQ/company-logo_100_100/0/1721344095827?e=1729728000&v=beta&t=IqB8V-K4rOaY0hSxOaODnzG6ao1RRp-knFiVhqqUtHo"
+            alt="habithub-logo"
+            width="60px"
+            height="60px"
+          />
+          <p>Best regards,</p>
+          <p>The HabitHub Team</p>
+        </div>
       </div>
       <div class="footer">
         <p>&copy; 2024 HabitHub. All rights reserved.</p>
