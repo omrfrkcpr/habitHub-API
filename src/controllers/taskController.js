@@ -203,7 +203,11 @@ module.exports = {
 
     const formattedDate = new Date(date).toLocaleDateString("en-GB");
 
-    const emailHtml = getTaskEmailHtml(user.firstName, formattedDate, tasks);
+    const emailHtml = getTaskEmailHtml(
+      user?.username || user?.firstName,
+      formattedDate,
+      tasks
+    );
 
     const emailSubject = `Your tasks for ${formattedDate}`;
 
