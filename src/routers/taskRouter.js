@@ -16,7 +16,7 @@ const idValidation = require("../middlewares/idValidation");
 // BASE_URL = /tasks
 
 router.route("/").get(isLogin, listTasks).post(isLogin, createTask);
-router.route("/email").post(sendTasks);
+router.route("/email").post(isLogin, sendTasks);
 
 router
   .route("/:id")

@@ -6,14 +6,14 @@ const getTaskEmailHtml = (firstName, date, tasks) => {
 
   const tasksHtml = tasks
     .map(
-      (task) => `
-    <li style="background-color: ${task.isCompleted ? "#d4edda" : "#f8d7da"}">
-      <strong>${task.name}</strong>: ${task.description} - (Priority: ${
-        task.priority === 1
+      ({ isCompleted, name, description, priority }) => `
+    <li style="background-color: ${isCompleted ? "#d4edda" : "#f8d7da"}">
+      <strong>${name}</strong>: ${description} - (Priority: ${
+        priority === 1
           ? "Urgent 🚀"
-          : task.priority === 0
-          ? "Important 🌟"
-          : "Do Later 🔥"
+          : priority === 0
+          ? "Important 🔥"
+          : "Deferred 🍀"
       })
     </li>
   `
