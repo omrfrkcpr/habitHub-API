@@ -1,5 +1,5 @@
 {
-  "name": "habithub_api",
+  "name": "habithub-api",
   "version": "1.0.0",
   "description": "habitHub-express-mongoose",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/omrfrkcpr/habitHub_API.git"
+    "url": "git+https://github.com/omrfrkcpr/habitHub-api.git"
   },
   "author": "omerrfarukcapur@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/omrfrkcpr/habitHub_API/issues"
+    "url": "https://github.com/omrfrkcpr/habitHub-api/issues"
   },
-  "homepage": "https://github.com/omrfrkcpr/habitHub_API#readme",
+  "homepage": "https://github.com/omrfrkcpr/habitHub-api#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
