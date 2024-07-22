@@ -7,6 +7,28 @@ module.exports = async function () {
   const Task = require("../models/taskModel");
   const fs = require("fs");
 
+  const cardColors = [
+    "#ADF7B6",
+    "#A817C0",
+    "#FFC09F",
+    "#B0FFFA",
+    "#FCFF52",
+    "#4EFF31",
+    "#5BFFD8",
+    "#0038FF",
+    "#622BFF",
+    "#D21DFF",
+    "#B92350",
+    "#FF0000",
+    "#E9E3E8",
+    "#554E55",
+  ];
+
+  // Helper function to get a random element from an array - for cardColors
+  const getRandomElement = (array) => {
+    return array[Math.floor(Math.random() * array.length)];
+  };
+
   // Load the JSON data
   const tasksData = JSON.parse(
     fs.readFileSync("./src/helpers/tasks.json", "utf-8")
@@ -30,8 +52,9 @@ module.exports = async function () {
   };
 
   try {
-    // Clear the Tag collection
-    await Tag.deleteMany();
+    // Clear the Tag and Task collection of admin user
+    await Tag.deleteMany({ userId: admin_userId });
+    await Task.deleteMany({ userId: admin_userId });
 
     // Create the new tags
     const dailyRoutineTag = new Tag({
@@ -65,7 +88,7 @@ module.exports = async function () {
       const task = new Task({
         name: randomTask.name,
         description: randomTask.description,
-        cardColor: "#" + Math.floor(Math.random() * 16777215).toString(16), // Random color
+        cardColor: getRandomElement(cardColors), // Random color
         repeat: "daily",
         priority: Math.floor(Math.random() * 3) - 1, // Random priority between -1 and 1
         dueDates: getRandomDueDates(3), // Generate 3 random due dates
