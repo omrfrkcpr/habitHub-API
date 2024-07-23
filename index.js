@@ -38,7 +38,7 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-    // cookie: { secure: false }, // Set secure to true if using HTTPS
+    // cookie: { secure: true }, // Set secure to true if using HTTPS / after deploy
   })
 );
 
