@@ -32,7 +32,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Authentication Config
-require("./src/configs/auth/passport");
+require("./src/configs/auth/passportConfig");
 app.use(
   session({
     secret: process.env.SECRET_KEY,

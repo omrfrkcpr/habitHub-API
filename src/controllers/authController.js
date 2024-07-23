@@ -134,7 +134,11 @@ module.exports = {
     const sessionData = JSON.parse(Object.values(req.sessionStore.sessions)[0])
       .passport.user;
 
-    const { accessToken, user, tokenData, refreshToken } = sessionData;
+    const { user } = sessionData;
+
+    const { tokenData, accessToken, refreshToken } = await generateAllTokens(
+      user
+    );
 
     console.log(accessToken);
     console.log(user);
