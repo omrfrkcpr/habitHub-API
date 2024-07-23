@@ -1,8 +1,8 @@
-Authentication Process
+**Authentication Process**
 
 - This project implements a comprehensive authentication system using the following technologies: Node.js, Express.js, JWT, Simple Token, MongoDB, Mongoose, Passport.js, Session, Nodemailer, and AWS-S3. Below is a detailed overview of the authentication process:
 
-User Registration and Verification
+**User Registration and Verification**
 
 1- User Registration:
 
@@ -16,7 +16,7 @@ User Registration and Verification
 - Users must click the verification link to activate their account.
 - The backend server verifies the token from the link and activates the user account.
 
-Social Media Login
+**Social Media Login**
 
 1- OAuth Login:
 
@@ -25,7 +25,7 @@ Social Media Login
 - If the user does not exist in the database, a new user is created with the retrieved data.
 - User session data is stored using express-session.
 
-Login and Token Management
+**Login and Token Management**
 
 1- User Login:
 
@@ -38,11 +38,11 @@ Login and Token Management
 - The session duration is set to 45 minutes. If needed, the access token can be refreshed using the refresh token to extend the session by another 45 minutes.
 - If the session expires without token refresh, users are redirected to the login page to re-authenticate.
 
-Password Security
+**Password Security**
 
 - When creating an account, user passwords are securely hashed before storing in the database to ensure confidentiality.
 
-Avatar Management
+**Avatar Management**
 
 1- Social Media Avatars:
 
@@ -53,11 +53,11 @@ Avatar Management
 - Users can manually upload their avatar photos, which are then stored in AWS-S3.
 - The URL of the uploaded avatar is saved in the database.
 
-Visual Diagram
+**Visual Diagram**
 
 - To better understand the authentication flow, here is a visual representation:
-
-User Registration and Verification Process:
+  
+![habithub-auth](https://github.com/user-attachments/assets/626e84e9-b684-4e31-903f-44b334ca7806)
 
 User -> Web/Mobile Application (Submit registration form)
 Web/Mobile Application -> Backend Server (Data processing and encryption)
