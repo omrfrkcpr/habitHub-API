@@ -140,7 +140,7 @@ module.exports = {
       user
     );
 
-    console.log(accessToken);
+    // console.log(accessToken);
     console.log(user);
 
     if (accessToken && user && refreshToken && tokenData) {
