@@ -154,6 +154,7 @@ module.exports = {
     }
 
     if (req.file) {
+      // req.file.buffer // actual image data
       req.body.avatar = "/uploads/" + req.file.filename;
     }
 
