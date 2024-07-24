@@ -35,7 +35,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Set security HTTP headers
-app.use(helmet());
+// app.use(helmet()); // prevent local uploads?
 
 // Limit requests from same IP
 const limiter = rateLimit({
@@ -43,7 +43,7 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   message: "Too many request from this IP, please try again later!",
 });
-app.use("/api", limiter);
+app.use("/", limiter);
 
 // Authentication Config
 require("./src/configs/auth/passportConfig");
