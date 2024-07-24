@@ -74,9 +74,19 @@ module.exports = (req, res, next) => {
           }
           const tagId = tag._id.toString();
           if (!acc[tagId]) {
-            acc[tagId] = { name: tag.name, count: 0 };
+            acc[tagId] = {
+              name: tag.name,
+              count: 0,
+              countOfComplete: 0,
+              countOfUncomplete: 0,
+            };
           }
           acc[tagId].count++;
+          if (task.isCompleted) {
+            acc[tagId].countOfComplete++;
+          } else {
+            acc[tagId].countOfUncomplete++;
+          }
           return acc;
         }, {});
 
@@ -87,6 +97,8 @@ module.exports = (req, res, next) => {
             tagId,
             name: taskGroups[tagId].name,
             count: taskGroups[tagId].count,
+            countOfComplete: taskGroups[tagId].countOfComplete,
+            countOfUncomplete: taskGroups[tagId].countOfUncomplete,
           }))
           .sort((a, b) => b.count - a.count);
 

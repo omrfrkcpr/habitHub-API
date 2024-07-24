@@ -20,7 +20,13 @@ module.exports = {
     }
 
     const tags = await res.getModelList(Tag, listFilter);
-    res.status(200).send({ error: false, data: tags });
+    res
+      .status(200)
+      .send({
+        error: false,
+        details: await res.getModelListDetails(Tag, listFilter),
+        data: tags,
+      });
   },
   // /:id => GET
   listTagTasks: async (req, res) => {
