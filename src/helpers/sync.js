@@ -24,6 +24,23 @@ module.exports = async function () {
     "#554E55",
   ];
 
+  const darkCardColors = [
+    "#468E58", // #ADF7B6
+    "#A817C0", // #A817C0
+    "#996852", // #FFC09F
+    "#569E9B", // #B0FFFA
+    "#96992E", // #FCFF52
+    "#268014", // #4EFF31
+    "#2E8C78", // #5BFFD8
+    "#0038FF", // #0038FF
+    "#622BFF", // #622BFF
+    "#D21DFF", // #D21DFF
+    "#B92350", // #B92350
+    "#FF0000", // #FF0000
+    "#8B8490", // #E9E3E8
+    "#554E55", // #554E55
+  ];
+
   // Helper function to get a random element from an array - for cardColors
   const getRandomElement = (array) => {
     return array[Math.floor(Math.random() * array.length)];
@@ -88,7 +105,7 @@ module.exports = async function () {
       const task = new Task({
         name: randomTask.name,
         description: randomTask.description,
-        cardColor: getRandomElement(cardColors), // Random color
+        cardColor: getRandomElement(darkCardColors), // Random color
         repeat: "daily",
         priority: Math.floor(Math.random() * 3) - 1, // Random priority between -1 and 1
         dueDates: getRandomDueDates(3), // Generate 3 random due dates
