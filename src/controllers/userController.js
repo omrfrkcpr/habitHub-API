@@ -167,7 +167,7 @@ module.exports = {
     }); // returns data
 
     // delete old uploaded image
-    if (req.file && data.avatar) {
+    if (req.file && data.avatar && data.avatar.includes("/uploads/")) {
       fs.unlinkSync(`.${data.avatar}`, (err) => console.log(err));
     }
 
