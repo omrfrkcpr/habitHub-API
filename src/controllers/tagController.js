@@ -20,13 +20,11 @@ module.exports = {
     }
 
     const tags = await res.getModelList(Tag, listFilter);
-    res
-      .status(200)
-      .send({
-        error: false,
-        details: await res.getModelListDetails(Tag, listFilter),
-        data: tags,
-      });
+    res.status(200).send({
+      error: false,
+      details: await res.getModelListDetails(Tag, listFilter),
+      data: tags,
+    });
   },
   // /:id => GET
   listTagTasks: async (req, res) => {
@@ -62,14 +60,19 @@ module.exports = {
     */
     const { name } = req.body;
 
-    const userId = req.user.isAdmin
-      ? req.body.userId // userId must be provided in the request body by an admin
-      : req.user?._id || req.user?.id;
+    let userId = req.user?._id || req.user?.id;
+
+    if (req.body.userId && req.user.isAdmin) {
+      userId = req.body.userId;
+    }
 
     const existingName = await Tag.findOne({ name, userId });
 
     if (existingName) {
-      throw new CustomError("Tag already exists", 403);
+      throw new CustomError(
+        `This Tag name (${req.body.name}) already exists`,
+        403
+      );
     }
 
     const tag = new Tag({ name, userId });
