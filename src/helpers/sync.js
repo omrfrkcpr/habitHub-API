@@ -1,11 +1,11 @@
 "use strict";
+const Tag = require("../models/tagModel");
+const Task = require("../models/taskModel");
+const fs = require("fs");
 
 module.exports = async function () {
+  // Return null early to prevent the rest of the code from executing
   return null;
-
-  const Tag = require("../models/tagModel");
-  const Task = require("../models/taskModel");
-  const fs = require("fs");
 
   const cardColors = [
     "#ADF7B6",
@@ -47,8 +47,11 @@ module.exports = async function () {
   };
 
   // Load the JSON data
-  const tasksData = JSON.parse(
-    fs.readFileSync("./src/helpers/tasks.json", "utf-8")
+  const workTasksData = JSON.parse(
+    fs.readFileSync("./src/helpers/workTasks.json", "utf-8")
+  );
+  const dailyTasksData = JSON.parse(
+    fs.readFileSync("./src/helpers/dailyTasks.json", "utf-8")
   );
 
   const admin_userId = process.env.ADMIN_USERID;
@@ -96,11 +99,19 @@ module.exports = async function () {
       );
     }
 
-    for (let i = 0; i < 10; i++) {
-      // Creating 10 random tasks
-      const randomTask =
-        tasksData[Math.floor(Math.random() * tasksData.length)];
-      const randomTag = tags[Math.floor(Math.random() * tags.length)]; // Randomly select one of the created tags
+    for (let i = 0; i < 20; i++) {
+      // Randomly select one of the created tags
+      const randomTag = tags[Math.floor(Math.random() * tags.length)];
+      let randomTask;
+
+      // Select a task based on the tag
+      if (randomTag.name === "Work Routine") {
+        randomTask =
+          workTasksData[Math.floor(Math.random() * workTasksData.length)];
+      } else if (randomTag.name === "Daily Routine") {
+        randomTask =
+          dailyTasksData[Math.floor(Math.random() * dailyTasksData.length)];
+      }
 
       const task = new Task({
         name: randomTask.name,

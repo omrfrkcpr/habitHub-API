@@ -1,0 +1,78 @@
+[
+  {
+    "name": "Morning exercise",
+    "description": "Start the day with a 30-minute workout or jog."
+  },
+  {
+    "name": "Breakfast",
+    "description": "Prepare and eat a healthy breakfast."
+  },
+  {
+    "name": "Read a book",
+    "description": "Spend 20 minutes reading a book."
+  },
+  {
+    "name": "Check and respond to personal emails",
+    "description": "Review and reply to any personal emails."
+  },
+  {
+    "name": "Grocery shopping",
+    "description": "Buy groceries for the week."
+  },
+  {
+    "name": "Coffee with friends",
+    "description": "Meet friends for coffee and catch up."
+  },
+  {
+    "name": "Meditation",
+    "description": "Practice meditation for 15 minutes to relax and clear your mind."
+  },
+  {
+    "name": "Lunch",
+    "description": "Prepare and eat a balanced lunch."
+  },
+  {
+    "name": "House cleaning",
+    "description": "Clean and organize a part of your house."
+  },
+  {
+    "name": "Pick up package",
+    "description": "Collect a package from the post office or delivery point."
+  },
+  {
+    "name": "Call family",
+    "description": "Spend some time catching up with family members over the phone."
+  },
+  {
+    "name": "Afternoon walk",
+    "description": "Take a short walk in the afternoon to get some fresh air."
+  },
+  {
+    "name": "Hobby time",
+    "description": "Dedicate time to work on a personal hobby or project."
+  },
+  {
+    "name": "Cook dinner",
+    "description": "Prepare and cook a healthy dinner."
+  },
+  {
+    "name": "Watch a movie or TV show",
+    "description": "Relax and watch a movie or your favorite TV show."
+  },
+  {
+    "name": "Evening stretch",
+    "description": "Do some light stretching exercises before bed."
+  },
+  {
+    "name": "Plan for the next day",
+    "description": "Make a to-do list for the next day and set your priorities."
+  },
+  {
+    "name": "Journal",
+    "description": "Write down your thoughts, reflections, or experiences from the day."
+  },
+  {
+    "name": "Get ready for bed",
+    "description": "Follow your bedtime routine and ensure you get enough sleep."
+  }
+]

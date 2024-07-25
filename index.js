@@ -137,4 +137,4 @@ app.use(require("./src/middlewares/errorHandler"));
 app.listen(PORT, () => console.log(`server runned on http://${HOST}:${PORT}`));
 
 // random task creater = comment return in sync.js before run that
-// require("./src/helpers/sync")();
+// require("./src/helpers/sync")(); //! be carefull!
