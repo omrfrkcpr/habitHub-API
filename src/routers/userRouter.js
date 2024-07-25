@@ -10,20 +10,21 @@ const {
 } = require("../controllers/userController");
 const { isAdmin, isAdminOrOwn } = require("../middlewares/permissions");
 const idValidation = require("../middlewares/idValidation");
-const upload = require("../middlewares/upload");
+// const upload = require("../middlewares/localUpload");
+const { upload, uploadToS3 } = require("../middlewares/awsS3Upload");
 
 // BASE_URL: /users
 
 router
   .route("/")
   .get(isAdmin, listUsers)
-  .post(upload.single("avatar"), createUser);
+  .post(upload.single("avatar"), uploadToS3, createUser);
 router
   .route("/:id")
   .all(idValidation("User"), isAdminOrOwn)
   .get(readUser)
-  .put(upload.single("avatar"), updateUser)
-  .patch(upload.single("avatar"), updateUser)
+  .put(upload.single("avatar"), uploadToS3, updateUser)
+  .patch(upload.single("avatar"), uploadToS3, updateUser)
   .delete(destroyUser);
 
 module.exports = router;

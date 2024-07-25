@@ -8,6 +8,10 @@ const Task = require("../models/taskModel");
 const passwordEncryption = require("../helpers/passwordEncryption");
 const fs = require("node:fs");
 const validator = require("validator");
+const {
+  deleteObjectByDateKeyNumber,
+} = require("../helpers/deleteObjectByKeyNumberS3Bucket");
+const { extractDateNumber } = require("../helpers/extractDateNumber");
 
 module.exports = {
   // GET
@@ -63,14 +67,21 @@ module.exports = {
       await User.updateMany({ isAdmin: true }, { isAdmin: false });
     }
 
-    if (req.file) {
-      req.body.avatar = "/uploads/" + req.file.filename;
+    // // local upload
+    // if (req.file) {
+    //   req.body.avatar = "/uploads/" + req.file.filename;
+    // }
+
+    let imagePath = "";
+    if (req.fileLocation) {
+      imagePath = req.fileLocation;
     }
 
     // Create new user in database
     const data = await User.create({
       ...req.body,
       passpord: bcrypt.hashSync(req.body.password, 10),
+      avatar: imagePath,
     });
 
     // Create new token for new user
@@ -153,10 +164,31 @@ module.exports = {
       }
     }
 
-    if (req.file) {
-      // req.file.buffer // actual image data
-      req.body.avatar = "/uploads/" + req.file.filename;
+    // // local upload
+    // if (req.file) {
+    //   // req.file.buffer // actual image data
+    //   req.body.avatar = "/uploads/" + req.file.filename;
+    // }
+
+    // ====================USER-AVATAR===================== //
+
+    const avatarIncludesS3 =
+      user.avatar && user.avatar.includes(process.env.AWS_S3_BUCKET_REGION);
+
+    if (req.fileLocation) {
+      if (avatarIncludesS3) {
+        const identifierForImage = extractDateNumber(user.avatar);
+        await deleteObjectByDateKeyNumber(identifierForImage); // delete existing user avatar from S3 bucket
+      }
+      req.body.avatar = req.fileLocation;
+    } else if (user.avatar && req.body.avatar === "") {
+      if (avatarIncludesS3) {
+        const identifierForImage = extractDateNumber(user.avatar);
+        await deleteObjectByDateKeyNumber(identifierForImage); // just delete existing user avatar from S3 bucket
+      }
     }
+
+    // ====================USER-AVATAR===================== //
 
     if (req.body.oldPassword) {
       delete req.body.oldPassword; // requires just for security and user notifications
@@ -166,10 +198,10 @@ module.exports = {
       runValidators: true,
     }); // returns data
 
-    // delete old uploaded image
-    if (req.file && data.avatar) {
-      fs.unlinkSync(`.${data.avatar}`, (err) => console.log(err));
-    }
+    // // delete old uploaded image
+    // if (req.file && data.avatar) {
+    //   fs.unlinkSync(`.${data.avatar}`, (err) => console.log(err));
+    // }
 
     let message;
 
@@ -219,9 +251,17 @@ module.exports = {
     // Delete user
     const result = await User.findOneAndDelete(idFilter); // returns data
 
-    // delete old uploaded image
-    if (result.avatar) {
-      fs.unlinkSync(`.${result.avatar}`, (err) => console.log(err));
+    // // delete old uploaded image
+    // if (result.avatar) {
+    //   fs.unlinkSync(`.${result.avatar}`, (err) => console.log(err));
+    // }
+
+    if (
+      result.avatar &&
+      result.avatar.includes(process.env.AWS_S3_BUCKET_REGION)
+    ) {
+      const identifierForImage = extractDateNumber(result.avatar);
+      await deleteObjectByDateKeyNumber(identifierForImage); // delete existing user avatar from s3 bucket
     }
 
     res.status(204).send({
