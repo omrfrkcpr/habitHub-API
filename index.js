@@ -35,7 +35,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Set security HTTP headers
-// app.use(helmet()); // prevent local uploads?
+app.use(helmet()); // prevent local uploads?
 
 // Limit requests from same IP
 const limiter = rateLimit({
@@ -106,6 +106,15 @@ app.all("/", (req, res) => {
     },
     user: req.user,
   });
+});
+
+//Test middlewares
+app.use((req, res, next) => {
+  //res.setHeader('Access-Control-Allow-Origin', '*');
+  //res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+  //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+  next();
 });
 
 // Routers
