@@ -90,7 +90,7 @@ module.exports = (req, res, next) => {
           return acc;
         }, {});
 
-        console.log("Task groups by tagId:", taskGroups);
+        // console.log("Task groups by tagId:", taskGroups);
 
         lists = Object.keys(taskGroups)
           .map((tagId) => ({
@@ -102,7 +102,7 @@ module.exports = (req, res, next) => {
           }))
           .sort((a, b) => b.count - a.count);
 
-        console.log("Sorted lists:", lists);
+        // console.log("Sorted lists:", lists);
       } catch (err) {
         console.error("Error processing lists:", err);
       }

@@ -8,7 +8,7 @@ passport.use(
   new GoogleStrategy(
     googleSetup,
     async (accessToken, refreshToken, profile, done) => {
-      console.log("Google Profile: ", profile);
+      // console.log("Google Profile: ", profile);
 
       try {
         let user = await User.findOne({
