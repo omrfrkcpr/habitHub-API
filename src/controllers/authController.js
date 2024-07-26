@@ -128,6 +128,7 @@ module.exports = {
     });
   },
   socialLogin: async (req, res) => {
+    // console.log(req);
     // console.log(
     //   JSON.parse(Object.values(req?.sessionStore?.sessions)[0])?.passport?.user
     // );
