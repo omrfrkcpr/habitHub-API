@@ -58,7 +58,7 @@ module.exports = (req, res, next) => {
       ...search,
     }).populate(populate); // Use populate if defined
 
-    console.log("Fetched data with populated tagId:", data);
+    // console.log("Fetched data with populated tagId:", data);
 
     let lists = [];
     if (Model === Task) {
