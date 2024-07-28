@@ -33,6 +33,18 @@ TaskSchema.set("toJSON", {
   },
 });
 
+// In order to spread the old task data during the update process, this data needs to be removed.
+TaskSchema.set("toObject", {
+  virtuals: true,
+  versionKey: false,
+  transform: function (doc, ret) {
+    delete ret._id;
+    delete ret.createdAt;
+    delete ret.updatedAt;
+    delete ret.__v;
+  },
+});
+
 const Task = mongoose.model("Task", TaskSchema);
 
 module.exports = Task;
