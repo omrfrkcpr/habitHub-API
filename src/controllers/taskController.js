@@ -302,6 +302,43 @@ module.exports = {
       });
     }
   },
+  // /id => POST
+  extractTask: async (req, res) => {
+    const { date } = req.body;
+    const currentTask = await Task.findById(req.params.id);
+
+    const reqDate = new Date(date);
+    const reqDay = reqDate.getDate();
+    const reqMonth = reqDate.getMonth();
+    const reqYear = reqDate.getFullYear();
+
+    // Find index of matching due date if any
+    const matchingDueDateIndex = currentTask.dueDates.findIndex((dueDate) => {
+      const dueDateObj = new Date(dueDate);
+      return (
+        dueDateObj.getDate() === reqDay &&
+        dueDateObj.getMonth() === reqMonth &&
+        dueDateObj.getFullYear() === reqYear
+      );
+    });
+
+    if (matchingDueDateIndex === -1) {
+      throw new CustomError("Date not found", 404);
+    }
+
+    const updatedDueDates = [
+      ...currentTask.dueDates.slice(0, matchingDueDateIndex),
+      ...currentTask.dueDates.slice(matchingDueDateIndex + 1),
+    ];
+
+    currentTask.dueDates = updatedDueDates;
+    await currentTask.save();
+
+    return res.status(204).send({
+      error: false,
+      message: "Task successfully deleted",
+    });
+  },
   // /:id => DELETE
   destroyTask: async (req, res) => {
     /*

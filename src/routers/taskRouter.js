@@ -8,6 +8,7 @@ const {
   readTask,
   updateTask,
   destroyTask,
+  extractTask,
   sendTasks,
 } = require("../controllers/taskController");
 const { isLogin, isTaskOwnerOrAdmin } = require("../middlewares/permissions");
@@ -23,6 +24,7 @@ router
   .all(idValidation("Task"), isTaskOwnerOrAdmin)
   .get(readTask)
   .put(updateTask)
+  .post(extractTask)
   .patch(updateTask)
   .delete(destroyTask);
 
