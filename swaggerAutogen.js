@@ -29,11 +29,24 @@ const document = {
       description:
         "Simple Token Authentication * Example: <b>Token ...tokenKey...</b>",
     },
+    Bearer: {
+      type: "apiKey",
+      in: "header",
+      name: "Authorization",
+      description:
+        "JWT Authentication * Example: <b>Bearer ...accessToken...</b>",
+    },
   },
-  security: [{ Token: [] }],
+  security: [{ Token: [] }, { Bearer: [] }],
   definitions: {
     // Models:
-    // "User": require('./src/models/user').schema.obj,
+    Tag: require("./src/models/tagModel").schema.obj,
+    Task: require("./src/models/taskModel").schema.obj,
+    TokenBlacklist: require("./src/models/tokenBlacklistModel").schema.obj,
+    Token: require("./src/models/tokenModel").schema.obj,
+    TokenVerification: require("./src/models/tokenVerificationModel").schema
+      .obj,
+    User: require("./src/models/userModel").schema.obj,
   },
 };
 
