@@ -8,7 +8,7 @@ const {
   createUser,
   destroyUser,
 } = require("../controllers/userController");
-const { isAdmin, isAdminOrOwn } = require("../middlewares/permissions");
+const { isAdmin, isUserOwnerOrAdmin } = require("../middlewares/permissions");
 const idValidation = require("../middlewares/idValidation");
 // const upload = require("../middlewares/localUpload");
 const { upload, uploadToS3 } = require("../middlewares/awsS3Upload");
@@ -21,7 +21,7 @@ router
   .post(upload.single("avatar"), uploadToS3, createUser);
 router
   .route("/:id")
-  .all(idValidation("User"), isAdminOrOwn)
+  .all(idValidation("User"), isUserOwnerOrAdmin)
   .get(readUser)
   .put(upload.single("avatar"), uploadToS3, updateUser)
   .patch(upload.single("avatar"), uploadToS3, updateUser)

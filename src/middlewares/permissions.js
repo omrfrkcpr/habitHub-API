@@ -6,6 +6,7 @@
 const { CustomError } = require("../errors/customError");
 const Task = require("../models/taskModel");
 const Tag = require("../models/tagModel");
+const User = require("../models/userModel");
 
 module.exports = {
   isLogin: (req, res, next) => {
@@ -34,9 +35,13 @@ module.exports = {
     }
   },
 
-  isAdminOrOwn: (req, res, next) => {
+  isUserOwnerOrAdmin: async (req, res, next) => {
     if (req.user && req.user.isActive) {
-      if (req.user.isAdmin || req.params?.id == req.user._id) {
+      const user = await User.findById(req.params.id);
+      if (
+        req.user.isAdmin ||
+        String(user.id || user._id) === String(req.user.id || req.user._id)
+      ) {
         next();
       } else {
         throw new CustomError(
