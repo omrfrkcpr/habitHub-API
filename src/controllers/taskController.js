@@ -89,17 +89,25 @@ module.exports = {
       - Saves the new task to the database.
       - Sends a response indicating the success of the creation operation along with the created task data.
     */
-    const { name, description, cardColor, repeat, priority, dueDates, tagId } =
-      req.body;
+    const {
+      name,
+      description,
+      cardColor,
+      repeat,
+      priority,
+      dueDates,
+      tagName,
+    } = req.body;
 
     // Check if the tagId in req.body exists in the Tag model
     let tag = await Tag.findOne({
-      $or: [{ _id: req.body.tagId }, { name: req.body.tagId }],
+      name: tagName,
     });
+
     if (!tag) {
       // If tag does not exist, create a new Tag
       tag = new Tag({
-        name: req.body.tagId,
+        name: tagName,
         userId: req.user.id || req.user._id,
       });
       await tag.save();
@@ -112,7 +120,7 @@ module.exports = {
       repeat,
       priority,
       dueDates,
-      tagId,
+      tagId: tag._id || tag.id,
       userId: req.user.isAdmin
         ? req.body.userId // userId must be provided in the request body by an admin
         : req.user?.id || req.user?._id,
@@ -184,7 +192,7 @@ module.exports = {
       );
     });
 
-    const { date, ...restOfBody } = req.body;
+    const { date, tagName, ...restOfBody } = req.body;
 
     // Handle special cases
     if (isPriorityAndDateOnly(req.body)) {
@@ -241,13 +249,13 @@ module.exports = {
 
     // Check if the tagId in req.body exists in the Tag model
     let tag = await Tag.findOne({
-      $or: [{ _id: req.body.tagId }, { name: req.body.tagId }],
+      name: tagName,
     });
 
     if (!tag) {
       // If tag does not exist, create a new Tag
       tag = new Tag({
-        name: req.body.tagId,
+        name: tagName,
         userId: req.user.id || req.user._id,
       });
       await tag.save();

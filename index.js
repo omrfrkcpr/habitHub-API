@@ -84,7 +84,7 @@ app.use(
 );
 
 // Logger:
-// app.use(require("./src/middlewares/logger"));
+app.use(require("./src/middlewares/logger"));
 
 router.get("/auth/login/success", socialLogin);
 app.use(router);
@@ -122,7 +122,7 @@ app.use(require("./src/routers"));
 // app.use("/", require("./src/routers/"));
 
 // static files serve
-app.use("/uploads", express.static("./uploads"));
+// app.use("/uploads", express.static("./uploads"));
 
 app.use((req, res, next) => {
   res.status(404).send({

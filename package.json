@@ -4,7 +4,8 @@
   "description": "habitHub-express-mongoose",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "debug": "DEBUG=* node index.js"
   },
   "repository": {
     "type": "git",
