@@ -11,6 +11,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
 const passport = require("passport");
+const cookieParser = require("cookie-parser");
 
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
@@ -47,6 +48,7 @@ app.use("/", limiter);
 
 // Authentication Config
 require("./src/configs/auth/passportConfig");
+app.use(cookieParser());
 app.use(
   session({
     secret: process.env.SECRET_KEY,
