@@ -66,10 +66,10 @@ module.exports = (req, res, next) => {
         const taskGroups = data.reduce((acc, task) => {
           const tag = task.tagId;
           if (!tag || !tag._id || !tag.name) {
-            console.warn(
-              `Task with ID ${task._id} has an invalid tagId.`,
-              task.tagId
-            );
+            // console.warn(
+            //   `Task with ID ${task._id} has an invalid tagId.`,
+            //   task.tagId
+            // );
             return acc;
           }
           const tagId = tag._id.toString();
