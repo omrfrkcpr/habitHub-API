@@ -99,32 +99,41 @@ module.exports = {
       tagName,
     } = req.body;
 
-    // Check if the tagId in req.body exists in the Tag model
-    let tag = await Tag.findOne({
-      name: tagName,
-    });
-
-    if (!tag) {
-      // If tag does not exist, create a new Tag
-      tag = new Tag({
+    let tagId = "";
+    if (tagName) {
+      // Check if the tagId in req.body exists in the Tag model
+      let tag = await Tag.findOne({
         name: tagName,
-        userId: req.user.id || req.user._id,
       });
-      await tag.save();
+
+      if (!tag) {
+        // If tag does not exist, create a new Tag
+        tag = new Tag({
+          name: tagName,
+          userId: req.user.id || req.user._id,
+        });
+        await tag.save();
+      }
+      tagId = tag._id || tag.id;
     }
 
-    const newTask = new Task({
+    const newTaskData = new Task({
       name,
       description,
       cardColor,
       repeat,
       priority,
       dueDates,
-      tagId: tag._id || tag.id,
       userId: req.user.isAdmin
         ? req.body.userId // userId must be provided in the request body by an admin
         : req.user?.id || req.user?._id,
     });
+
+    if (tagId) {
+      newTaskData.tagId = tagId;
+    }
+
+    const newTask = new Task(newTaskData);
 
     const task = await newTask.save();
     res.send({
@@ -247,25 +256,36 @@ module.exports = {
       });
     }
 
-    // Check if the tagId in req.body exists in the Tag model
-    let tag = await Tag.findOne({
-      name: tagName,
-    });
-
-    if (!tag) {
-      // If tag does not exist, create a new Tag
-      tag = new Tag({
+    let tagId = "";
+    if (tagName) {
+      // Check if the tagId in req.body exists in the Tag model
+      let tag = await Tag.findOne({
         name: tagName,
-        userId: req.user.id || req.user._id,
       });
-      await tag.save();
+
+      if (!tag) {
+        // If tag does not exist, create a new Tag
+        tag = new Tag({
+          name: tagName,
+          userId: req.user.id || req.user._id,
+        });
+        await tag.save();
+      }
+      tagId = tag._id || tag.id;
     }
 
     if (currentTask.dueDates.length === 1) {
       // Only one dueDate, directly update the current task
+      const updateData = { ...restOfBody };
+      if (tagId) {
+        updateData.tagId = tagId;
+      } else {
+        updateData.tagId = null;
+      }
+
       const updatedCurrentTask = await Task.findByIdAndUpdate(
         req.params.id,
-        { ...restOfBody, tagId: tag._id || tag.id },
+        updateData,
         { runValidators: true, new: true }
       );
 
@@ -291,8 +311,14 @@ module.exports = {
       const newTaskData = {
         ...restOfBody,
         dueDates: [date],
-        tagId: tag._id || tag.id,
       };
+
+      if (tagId) {
+        newTaskData.tagId = tagId;
+      } else {
+        newTaskData.tagId = null;
+      }
+
       const newTask = await createNewTask(newTaskData);
 
       return res.status(202).send({
