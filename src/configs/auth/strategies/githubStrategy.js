@@ -43,6 +43,7 @@ passport.use(
           });
           await user.save();
         } else {
+          // change avatar url of existing user, it user avatar doesnt exist
           if (!user.avatar) {
             await User.updateOne(
               {
@@ -54,6 +55,20 @@ passport.use(
                 ],
               },
               { avatar: profile._json?.avatar_url }
+            );
+          }
+          if (!user.githubId) {
+            // update githubId of existing user
+            await User.updateOne(
+              {
+                $or: [
+                  { githubId: profile._json?.id },
+                  { email: profile._json?.email },
+                  { firstName },
+                  { lastName },
+                ],
+              },
+              { githubId: profile._json?.id }
             );
           }
         }

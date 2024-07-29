@@ -30,10 +30,17 @@ passport.use(
           await user.save();
         } else {
           if (!user.avatar) {
-            // change avatar url of existing user
+            // change avatar url of existing user, it user avatar doesnt exist
             await User.updateOne(
               { email: profile.emails[0].value },
               { avatar: profile.photos[0].value }
+            );
+          }
+          if (!user.googleId) {
+            // update googleId of existing user
+            await User.updateOne(
+              { email: profile.emails[0].value },
+              { googleId: profile.id }
             );
           }
         }
