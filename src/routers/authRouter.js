@@ -16,7 +16,7 @@ const passport = require("passport");
 // BASE_URL: /auth
 
 router.post("/register", register);
-router.get("/verify-email/:token", verifyEmail);
+router.post("/verify-email/:token", verifyEmail);
 router.post("/login", login);
 router.get("/logout", logout);
 

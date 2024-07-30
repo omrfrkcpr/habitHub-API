@@ -12,6 +12,7 @@ const {
   deleteObjectByDateKeyNumber,
 } = require("../helpers/deleteObjectByKeyNumberS3Bucket");
 const { extractDateNumber } = require("../helpers/extractDateNumber");
+const { CustomError } = require("../errors/customError");
 
 module.exports = {
   // GET
@@ -106,6 +107,22 @@ module.exports = {
       - Uses runValidators: true to ensure validation rules are applied during update.
       - Returns a success message along with the updated user data.
     */
+
+    if (req.body.email) {
+      const existingUser = await User.findOne({
+        email: req.body.email,
+      });
+      if (existingUser && existingUser._id.toString() !== req.params.id) {
+        throw new CustomError("Email already exists", 400);
+      }
+    } else if (req.body.username) {
+      const existingUser = await User.findOne({
+        username: req.body.username,
+      });
+      if (existingUser && existingUser._id.toString() !== req.params.id) {
+        throw new CustomError("Username already exists", 400);
+      }
+    }
 
     const customFilter = req.user?.isAdmin
       ? { _id: req.params.id }

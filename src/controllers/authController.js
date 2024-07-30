@@ -124,7 +124,7 @@ module.exports = {
     // Return success message with new user data
     res.status(201).send({
       error: false,
-      message: "New Account successfully created",
+      message: "Please verify your email to complete your registration",
       bearer: {
         access: accessToken,
         refresh: refreshToken,
@@ -165,7 +165,7 @@ module.exports = {
       throw new CustomError("Authentication failed!", 401);
     }
   },
-  // GET
+  // POST
   verifyEmail: async (req, res) => {
     /*
       #swagger.tags = ['Authentication']
@@ -189,39 +189,34 @@ module.exports = {
 
     const token = req.params.token;
 
-    try {
-      // Check existance of provided token in tokenVerifications collection
-      const tokenData = await TokenVerification.findOne({ token });
+    // Check existance of provided token in tokenVerifications collection
+    const tokenData = await TokenVerification.findOne({ token });
 
-      if (!tokenData) {
-        throw new CustomError(
-          "Verification failed. Please try to login or register again!",
-          400
-        );
-      }
-
-      // Find user
-      const user = await User.findById(tokenData.userId);
-
-      if (!user) {
-        throw new CustomError("Account not found. Please try again!", 404);
-      }
-
-      // Activate user status
-      user.isActive = true;
-      await user.save();
-
-      // Delete VerficiationToken
-      await Token.findByIdAndDelete(tokenData._id || tokenData.id);
-
-      // Success response
-      res
-        .status(200)
-        .send({ error: false, message: "Account successfully verified!" });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Server error");
+    if (!tokenData) {
+      throw new CustomError(
+        "Verification failed. Please try to login or register again!",
+        400
+      );
     }
+
+    // Find user
+    const user = await User.findById(tokenData.userId);
+
+    if (!user) {
+      throw new CustomError("Account not found. Please try again!", 404);
+    }
+
+    // Activate user status
+    user.isActive = true;
+    await user.save();
+
+    // Delete VerficiationToken
+    await Token.findByIdAndDelete(tokenData._id || tokenData.id);
+
+    // Success response
+    res
+      .status(200)
+      .send({ error: false, message: "Account successfully verified!" });
   },
   // POST
   login: async (req, res) => {
