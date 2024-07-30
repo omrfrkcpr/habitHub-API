@@ -104,10 +104,21 @@ module.exports = {
       - Sends a response indicating the success of the update operation with a 200 status code.
       - If the tag is not found or the user is not authorized, sends a 404 status code with a "Tag not found" message.
     */
-    const tag = await Tag.updateOne({ _id: req.params.id }, req.body, {
-      new: true,
-      runValidators: true,
-    });
+
+    let userId = req.user?._id || req.user?.id;
+
+    if (req.body.userId && req.user.isAdmin) {
+      userId = req.body.userId;
+    }
+
+    const tag = await Tag.updateOne(
+      { _id: req.params.id, userId },
+      { name: req.body.name },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     res.status(tag.modifiedCount ? 202 : 404).send({
       error: !tag.modifiedCount,
