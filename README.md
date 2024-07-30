@@ -57,7 +57,7 @@
 
 - To better understand the authentication flow, here is a visual representation:
   
-![habithub-auth](https://github.com/user-attachments/assets/626e84e9-b684-4e31-903f-44b334ca7806)
+![habithub-auth-process](https://github.com/user-attachments/assets/178987a0-647b-4f45-91dd-a38fc32300b8)
 
 User -> Web/Mobile Application (Submit registration form)
 Web/Mobile Application -> Backend Server (Data processing and encryption)
