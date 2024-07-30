@@ -8,6 +8,7 @@ const {
   reset,
   forgot,
   verifyEmail,
+  agreeContract,
   logout,
 } = require("../controllers/authController");
 const passport = require("passport");

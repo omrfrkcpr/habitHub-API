@@ -52,6 +52,10 @@ const UserSchema = new mongoose.Schema(
     avatar: String,
     isActive: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
+    isAgreed: {
+      type: Boolean,
+      default: false,
+    },
   },
   { collection: "users", timestamps: true }
 );

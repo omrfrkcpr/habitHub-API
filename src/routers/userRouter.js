@@ -6,6 +6,7 @@ const {
   readUser,
   updateUser,
   createUser,
+  agreeContract,
   destroyUser,
 } = require("../controllers/userController");
 const { isAdmin, isUserOwnerOrAdmin } = require("../middlewares/permissions");
@@ -19,6 +20,9 @@ router
   .route("/")
   .get(isAdmin, listUsers)
   .post(upload.single("avatar"), uploadToS3, createUser);
+
+router.put("/agree-contract/:userId", agreeContract);
+
 router
   .route("/:id")
   .all(idValidation("User"), isUserOwnerOrAdmin)

@@ -37,9 +37,9 @@ module.exports = {
             in: "body",
             required: true,
              schema: {
-              "firstName": "test",
-              "lastName": "test",
-              "email": "testUser@gmail.com",
+              "firstName": "John",
+              "lastName": "Doe",
+              "email": "john.doe@gmail.com",
               "password": "Test@1234",
              }
       }
@@ -76,9 +76,15 @@ module.exports = {
       throw new CustomError("Email already exists!", 400);
     }
 
-    let formattedAvatar = "";
-    if (req.file) {
-      formattedAvatar = "/uploads/" + req.file.filename;
+    // local upload
+    // let formattedAvatar = "";
+    // if (req.file) {
+    //   formattedAvatar = "/uploads/" + req.file.filename;
+    // }
+
+    let imagePath = "";
+    if (req.fileLocation) {
+      imagePath = req.fileLocation;
     }
 
     // Create new user
@@ -89,7 +95,7 @@ module.exports = {
       password: bcrypt.hashSync(password, 10),
       isActive: false, // user will active his account via verification email
       isAdmin: false,
-      avatar: formattedAvatar,
+      avatar: imagePath,
     });
 
     // Save new user to the database

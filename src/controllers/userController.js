@@ -226,6 +226,25 @@ module.exports = {
       data,
     });
   },
+  // agree-contract/:userId => PUT
+  agreeContract: async (req, res) => {
+    if (req.params.userId) {
+      const user = await User.findOneAndUpdate(
+        { _id: req.params.userId },
+        { isAgreed: true },
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      res.status(200).send({
+        error: false,
+        message: "User has agreed to the contract",
+        new: user,
+      });
+    }
+  },
   // /:id => DELETE
   destroyUser: async (req, res) => {
     /*
