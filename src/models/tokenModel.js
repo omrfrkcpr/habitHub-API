@@ -15,12 +15,19 @@ const TokenSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-
     token: {
       type: String,
       trim: true,
       required: true,
       index: true,
+    },
+    expires: {
+      type: Date,
+      default: function () {
+        // Set the expiration date to 1 day from creation
+        return Date.now() + 24 * 60 * 60 * 1000;
+      },
+      index: { expires: "24h" }, // TTL index: document will be removed after 24 hours
     },
   },
   { collection: "tokens", timestamps: true }

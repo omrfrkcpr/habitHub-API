@@ -8,6 +8,7 @@ const {
   createUser,
   agreeContract,
   destroyUser,
+  socialLogin,
 } = require("../controllers/userController");
 const { isAdmin, isUserOwnerOrAdmin } = require("../middlewares/permissions");
 const idValidation = require("../middlewares/idValidation");

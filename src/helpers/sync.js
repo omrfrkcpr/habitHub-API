@@ -55,6 +55,7 @@ module.exports = async function () {
   );
 
   const admin_userId = process.env.ADMIN_USERID;
+  const user_userId = process.env.USER_USERID;
 
   // Helper function to generate random dates within the next 7-10 days
   const getRandomDueDates = (numDates) => {
@@ -73,17 +74,17 @@ module.exports = async function () {
 
   try {
     // Clear the Tag and Task collection of admin user
-    await Tag.deleteMany({ userId: admin_userId });
-    await Task.deleteMany({ userId: admin_userId });
+    await Tag.deleteMany({ userId: user_userId });
+    await Task.deleteMany({ userId: user_userId });
 
     // Create the new tags
     const dailyRoutineTag = new Tag({
       name: "Daily Routine",
-      userId: admin_userId,
+      userId: user_userId,
     });
     const workRoutineTag = new Tag({
       name: "Work Routine",
-      userId: admin_userId,
+      userId: user_userId,
     });
 
     const savedDailyRoutineTag = await dailyRoutineTag.save();
@@ -122,7 +123,7 @@ module.exports = async function () {
         dueDates: getRandomDueDates(3), // Generate 3 random due dates
         tagId: randomTag._id, // Assign the random tag's _id
         isCompleted: Math.random() < 0.5, // Random boolean
-        userId: admin_userId,
+        userId: user_userId,
       });
 
       await task.save();

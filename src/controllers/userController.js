@@ -13,6 +13,7 @@ const {
 } = require("../helpers/deleteObjectByKeyNumberS3Bucket");
 const { extractDateNumber } = require("../helpers/extractDateNumber");
 const { CustomError } = require("../errors/customError");
+const { generateAllTokens } = require("../helpers/tokenGenerator");
 
 module.exports = {
   // GET

@@ -7,6 +7,7 @@ const getResetPasswordEmailHtml = (firstName) => {
     "utf8"
   );
   html = html.replace(/{{firstName}}/g, firstName);
+  html = html.replace(/{{clientUrl}}/g, process.env.CLIENT_URL);
   return html;
 };
 

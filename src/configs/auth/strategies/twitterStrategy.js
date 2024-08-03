@@ -45,7 +45,7 @@ passport.use(
         user = await User.findOne({ twitterId: profile._json.id });
 
         // console.log(user)
-        return done(null, { user });
+        return done(null, user);
       } catch (err) {
         return done(err, null);
       }

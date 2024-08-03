@@ -3,15 +3,15 @@
 require("express-async-errors");
 const express = require("express");
 const app = express();
-const session = require("express-session");
 require("dotenv").config();
-const router = require("express").Router();
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
 const rateLimit = require("express-rate-limit");
 const passport = require("passport");
+const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const MongoStore = require("connect-mongo");
 
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
@@ -22,7 +22,7 @@ connectDB();
 
 // CORS Configs
 const cors = require("cors");
-const { socialLogin } = require("./src/controllers/authController");
+
 const corsOptions = {
   origin: [
     process.env.CLIENT_URL,
@@ -47,6 +47,7 @@ app.use(helmet()); // prevent local uploads?
 // app.use("/", limiter);
 
 // Authentication Config
+
 require("./src/configs/auth/passportConfig");
 app.use(cookieParser());
 app.use(
@@ -54,13 +55,21 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-    // cookie: { secure: true }, // Set secure to true if using HTTPS / after deploy
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      httpOnly: true,
+      secure: false, // Set secure to true if using HTTPS / after deployment
+    },
   })
 );
 
 // setup passport
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize()); // integration between passportjs and express app
+app.use(passport.session()); // session data controller
 
 // Accept JSON: (Body parser) => reading data from body into req.body
 app.use(express.json({ limit: "10kb" }));
@@ -87,9 +96,6 @@ app.use(
 
 // Logger:
 app.use(require("./src/middlewares/logger"));
-
-router.get("/auth/login/success", socialLogin);
-app.use(router);
 
 // Auhentication:
 app.use(require("./src/middlewares/authentication"));

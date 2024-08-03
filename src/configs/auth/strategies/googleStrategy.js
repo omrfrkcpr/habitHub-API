@@ -48,7 +48,7 @@ passport.use(
         user = await User.findOne({ email: profile.emails[0].value });
 
         // console.log(user)
-        return done(null, { user });
+        return done(null, user);
       } catch (err) {
         return done(err, null);
       }

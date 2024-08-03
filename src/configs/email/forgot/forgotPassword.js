@@ -8,6 +8,7 @@ const getForgotPasswordEmailHtml = (firstName, token) => {
   );
   html = html.replace(/{{firstName}}/g, firstName);
   html = html.replace(/{{token}}/g, token);
+  html = html.replace(/{{clientUrl}}/g, process.env.CLIENT_URL);
   return html;
 };
 

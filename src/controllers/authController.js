@@ -133,37 +133,58 @@ module.exports = {
       user: newUser,
     });
   },
-  socialLogin: async (req, res) => {
-    // console.log(req);
-    // console.log(
-    //   JSON.parse(Object.values(req?.sessionStore?.sessions)[0])?.passport?.user
-    // );
-    const sessionData = JSON.parse(Object.values(req.sessionStore.sessions)[0])
-      .passport.user;
+  // socialLogin: async (req, res) => {
+  //   console.log(req);
 
-    const { user } = sessionData;
+  //   const user = req.user;
+  //   console.log(user);
+  //   const { tokenData, accessToken, refreshToken } = await generateAllTokens(
+  //     user
+  //   );
+  //   if (accessToken && user && refreshToken && tokenData) {
+  //     res.status(200).send({
+  //       error: false,
+  //       message: "You are successfully logged in!",
+  //       bearer: {
+  //         access: accessToken,
+  //         refresh: refreshToken,
+  //       },
+  //       token: tokenData.token,
+  //       user,
+  //     });
+  //   } else {
+  //     throw new CustomError("Authentication failed!", 401);
+  //   }
+  // },
+  authSuccess: async (req, res) => {
+    const client_url = process.env.CLIENT_URL;
+    // console.log("REQ", req);
+    if (!req.user) {
+      return res.redirect(`${client_url}/auth/failure`);
+    }
+    console.log("User: ", req.user);
+    // res.redirect(`${client_url}/auth/success?provider=google`);
+    // Successful authentication, send user data to frontend
 
     const { tokenData, accessToken, refreshToken } = await generateAllTokens(
-      user
+      req.user
     );
 
-    // console.log(accessToken);
-    console.log(user);
-
-    if (accessToken && user && refreshToken && tokenData) {
-      res.status(200).send({
-        error: false,
-        message: "You are successfully logged in!",
-        bearer: {
-          access: accessToken,
-          refresh: refreshToken,
-        },
-        token: tokenData.token,
-        user,
-      });
-    } else {
-      throw new CustomError("Authentication failed!", 401);
-    }
+    const data = {
+      error: false,
+      message: "You are successfully logged in!",
+      bearer: {
+        access: accessToken,
+        refresh: refreshToken,
+      },
+      token: tokenData.token,
+      user: req.user,
+    };
+    res.redirect(
+      `${client_url}/auth/success?provider=google&user=${encodeURIComponent(
+        JSON.stringify(data)
+      )}`
+    );
   },
   // POST
   verifyEmail: async (req, res) => {
