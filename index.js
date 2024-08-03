@@ -39,12 +39,12 @@ app.use(cors(corsOptions));
 app.use(helmet()); // prevent local uploads?
 
 // Limit requests from same IP
-// const limiter = rateLimit({
-//   max: 100,
-//   windowMs: 60 * 60 * 1000,
-//   message: "Too many request from this IP, please try again later!",
-// });
-// app.use("/", limiter);
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many request from this IP, please try again later!",
+});
+app.use("/", limiter);
 
 // Authentication Config
 
@@ -62,7 +62,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24, // 1 day
       httpOnly: true,
-      secure: false, // Set secure to true if using HTTPS / after deployment
+      secure: process.env.NODE_ENV == "production" ? true : false, // Set secure to true if using HTTPS / after deployment
     },
   })
 );
