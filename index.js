@@ -7,11 +7,11 @@ require("dotenv").config();
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const hpp = require("hpp");
-const rateLimit = require("express-rate-limit");
 const passport = require("passport");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
+const { generalRateLimiter } = require("./src/middlewares/rateLimiters");
 
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
@@ -38,17 +38,8 @@ app.use(cors(corsOptions));
 // Set security HTTP headers
 app.use(helmet()); // prevent local uploads?
 
-// Limit requests from same IP
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000,
-  message: "Too many request from this IP, please try again later!",
-});
-app.use("/", limiter);
-
-// Authentication Config
-
-require("./src/configs/auth/passportConfig");
+// Passportjs Authentication Config
+require("./src/configs/passportjs-auth/passportConfig");
 app.use(cookieParser());
 app.use(
   session({
@@ -94,6 +85,9 @@ app.use(
   })
 );
 
+// Limit requests from same IP
+app.use("/", generalRateLimiter);
+
 // Logger:
 app.use(require("./src/middlewares/logger"));
 
@@ -116,14 +110,14 @@ app.all("/", (req, res) => {
   });
 });
 
-//Test middlewares
-app.use((req, res, next) => {
-  //res.setHeader('Access-Control-Allow-Origin', '*');
-  //res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-  //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
-  next();
-});
+// //Test middlewares
+// app.use((req, res, next) => {
+//   //res.setHeader('Access-Control-Allow-Origin', '*');
+//   //res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+//   //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//   res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+//   next();
+// });
 
 // Routers
 app.use(require("./src/routers"));

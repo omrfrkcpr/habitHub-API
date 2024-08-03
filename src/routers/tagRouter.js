@@ -17,7 +17,7 @@ const idValidation = require("../middlewares/idValidation");
 router.route("/").all(isLogin).get(listTags).post(createTag);
 router
   .route("/:id")
-  .all(idValidation("Tag"), isTagOwnerOrAdmin)
+  .all(idValidation, isTagOwnerOrAdmin)
   .get(readTag)
   .put(updateTag)
   .patch(updateTag)

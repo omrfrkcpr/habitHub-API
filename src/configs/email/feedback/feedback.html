@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #ca87f4;
+      }
+      .section {
+        margin-bottom: 20px;
+      }
+      .section p {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Feedback Received</h1>
+      <div class="section">
+        <p><strong>Name:</strong> {{name}}</p>
+      </div>
+      <div class="section">
+        <p><strong>Email:</strong> {{email}}</p>
+      </div>
+      <div class="section">
+        <p><strong>Subject:</strong> {{subject}}</p>
+      </div>
+      <div class="section">
+        <p><strong>Feedback:</strong></p>
+        <p>{{feedback}}</p>
+      </div>
+    </div>
+  </body>
+</html>

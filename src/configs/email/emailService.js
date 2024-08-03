@@ -3,6 +3,7 @@
 // $ npm i nodemailer
 const nodemailer = require("nodemailer");
 const { CustomError } = require("../../errors/customError");
+const { getFeedbackHtml } = require("./feedback/feedback");
 
 /* -------------------------------------------------------------------------- */
 
@@ -30,4 +31,22 @@ const sendEmail = async (to, subject, html) => {
   }
 };
 
-module.exports = { sendEmail };
+const sendFeedbackEmail = async (name, email, subject, feedback) => {
+  try {
+    const htmlContent = getFeedbackHtml(name, email, subject, feedback);
+
+    const info = await transporter.sendMail({
+      from: `"HabitHub" <${process.env.NODEMAILER_EMAIL}>`,
+      to: process.env.NODEMAILER_EMAIL,
+      subject: `Feedback: ${subject}`,
+      html: htmlContent,
+    });
+
+    console.log("Email successfully sent: %s", info.messageId);
+  } catch (error) {
+    console.error("Email sending error: ", error);
+    throw new CustomError("Failed to send feedback email. Please try again.");
+  }
+};
+
+module.exports = { sendEmail, sendFeedbackEmail };

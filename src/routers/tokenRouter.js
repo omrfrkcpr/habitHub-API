@@ -14,10 +14,6 @@ const idValidation = require("../middlewares/idValidation");
 
 router.use(isAdmin);
 router.route("/").get(listTokens).post(createToken);
-router
-  .route("/:id")
-  .all(idValidation("Token"))
-  .get(readToken)
-  .delete(destroyToken);
+router.route("/:id").all(idValidation).get(readToken).delete(destroyToken);
 
 module.exports = router;

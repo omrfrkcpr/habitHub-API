@@ -9,11 +9,10 @@ const {
   forgot,
   verifyEmail,
   logout,
-  socialLogin,
+  // socialLogin,
   authSuccess,
 } = require("../controllers/authController");
 const passport = require("passport");
-const { generateAllTokens } = require("../helpers/tokenGenerator");
 
 // BASE_URL: /auth
 

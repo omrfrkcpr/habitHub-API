@@ -14,6 +14,7 @@ const {
 const { extractDateNumber } = require("../helpers/extractDateNumber");
 const { CustomError } = require("../errors/customError");
 const { generateAllTokens } = require("../helpers/tokenGenerator");
+const { sendFeedbackEmail } = require("../configs/email/emailService");
 
 module.exports = {
   // GET
@@ -242,6 +243,28 @@ module.exports = {
       message,
       new: await User.findOne(customFilter),
       data,
+    });
+  },
+  // feedback => POST
+  handleFeedback: async (req, res) => {
+    /*
+      - Validates the request body for required fields.
+      - Calls sendFeedbackEmail() from emailService.js to send feedback email.
+      - Returns a success message if the email is sent successfully.
+    */
+
+    const { name, email, subject, feedback } = req.body;
+
+    if (!name || !email || !feedback) {
+      throw new CustomError("Please fill the contact form!", 400);
+    }
+
+    // send feedback email
+    await sendFeedbackEmail(name, email, subject, feedback);
+
+    res.status(200).send({
+      error: false,
+      message: "Thank you. We will get back to you as soon as possible!",
     });
   },
   // agree-contract/:userId => PUT

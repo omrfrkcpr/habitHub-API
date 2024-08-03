@@ -21,7 +21,7 @@ router.route("/email").post(isLogin, sendTasks);
 
 router
   .route("/:id")
-  .all(idValidation("Task"), isTaskOwnerOrAdmin)
+  .all(idValidation, isTaskOwnerOrAdmin)
   .get(readTask)
   .put(updateTask)
   .post(extractTask)
