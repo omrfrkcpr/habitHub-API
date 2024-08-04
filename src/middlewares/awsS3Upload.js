@@ -1,6 +1,6 @@
 "use strict";
 
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const dotenv = require("dotenv");
 const { CustomError } = require("../errors/customError");
@@ -11,10 +11,12 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Configure AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+const s3Client = new S3Client({
   region: process.env.AWS_S3_BUCKET_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
 // Middleware function to upload file to S3
@@ -41,8 +43,9 @@ const uploadToS3 = async (req, res, next) => {
   };
 
   try {
-    const data = await s3.upload(params).promise();
-    req.fileLocation = data.Location;
+    const command = new PutObjectCommand(params);
+    const data = await s3Client.send(command);
+    req.fileLocation = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${params.Key}`;
     next();
   } catch (err) {
     throw new CustomError("Failed to upload file.", 500);

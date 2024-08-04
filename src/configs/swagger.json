@@ -274,12 +274,49 @@
     },
     "/auth/twitter/callback": {
       "get": {
-        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Successful Authentication Callback",
+        "description": "Handles successful authentication, generates tokens, and redirects the user to the client URL with user data encoded in the query parameters.",
         "responses": {
-          "default": {
-            "description": ""
+          "302": {
+            "description": "Redirects to the client URL with user data",
+            "headers": {
+              "Location": {
+                "description": "The URL to which the user is redirected after successful authentication.",
+                "schema": {
+                  "type": "string",
+                  "example": "https://your-client-url.com/auth/success?provider=google&user=%7B%22error%22:false,%22message%22:%22You%20are%20successfully%20logged%20in!%22,%22bearer%22:%7B%22access%22:%22access-token%22,%22refresh%22:%22refresh-token%22%7D,%22token%22:%22token-data%22,%22user%22:%7B%22id%22:%22user-id%22,%22name%22:%22John%20Doe%22%7D%7D"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request if the user is not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Authentication failed or user not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/auth/google": {
@@ -294,12 +331,49 @@
     },
     "/auth/google/callback": {
       "get": {
-        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Successful Authentication Callback",
+        "description": "Handles successful authentication, generates tokens, and redirects the user to the client URL with user data encoded in the query parameters.",
         "responses": {
-          "default": {
-            "description": ""
+          "302": {
+            "description": "Redirects to the client URL with user data",
+            "headers": {
+              "Location": {
+                "description": "The URL to which the user is redirected after successful authentication.",
+                "schema": {
+                  "type": "string",
+                  "example": "https://your-client-url.com/auth/success?provider=google&user=%7B%22error%22:false,%22message%22:%22You%20are%20successfully%20logged%20in!%22,%22bearer%22:%7B%22access%22:%22access-token%22,%22refresh%22:%22refresh-token%22%7D,%22token%22:%22token-data%22,%22user%22:%7B%22id%22:%22user-id%22,%22name%22:%22John%20Doe%22%7D%7D"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request if the user is not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Authentication failed or user not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/auth/github": {
@@ -314,12 +388,49 @@
     },
     "/auth/github/callback": {
       "get": {
-        "description": "",
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Successful Authentication Callback",
+        "description": "Handles successful authentication, generates tokens, and redirects the user to the client URL with user data encoded in the query parameters.",
         "responses": {
-          "default": {
-            "description": ""
+          "302": {
+            "description": "Redirects to the client URL with user data",
+            "headers": {
+              "Location": {
+                "description": "The URL to which the user is redirected after successful authentication.",
+                "schema": {
+                  "type": "string",
+                  "example": "https://your-client-url.com/auth/success?provider=google&user=%7B%22error%22:false,%22message%22:%22You%20are%20successfully%20logged%20in!%22,%22bearer%22:%7B%22access%22:%22access-token%22,%22refresh%22:%22refresh-token%22%7D,%22token%22:%22token-data%22,%22user%22:%7B%22id%22:%22user-id%22,%22name%22:%22John%20Doe%22%7D%7D"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request if the user is not authenticated",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Authentication failed or user not found"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/tasks/": {

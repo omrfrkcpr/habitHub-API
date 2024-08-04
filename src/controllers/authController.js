@@ -157,6 +157,33 @@ module.exports = {
   //   }
   // },
   authSuccess: async (req, res) => {
+    /*
+      #swagger.tags = ["Authentication"]
+      #swagger.summary = "Successful Authentication Callback"
+      #swagger.description = "Handles successful authentication, generates tokens, and redirects the user to the client URL with user data encoded in the query parameters."
+      #swagger.responses[302] = {
+        description: 'Redirects to the client URL with user data',
+        headers: {
+          Location: {
+            description: 'The URL to which the user is redirected after successful authentication.',
+            schema: {
+              type: 'string',
+              example: 'https://your-client-url.com/auth/success?provider=google&user=%7B%22error%22:false,%22message%22:%22You%20are%20successfully%20logged%20in!%22,%22bearer%22:%7B%22access%22:%22access-token%22,%22refresh%22:%22refresh-token%22%7D,%22token%22:%22token-data%22,%22user%22:%7B%22id%22:%22user-id%22,%22name%22:%22John%20Doe%22%7D%7D'
+            }
+          }
+        }
+      }
+      #swagger.responses[400] = {
+        description: 'Bad request if the user is not authenticated',
+        schema: {
+          error: true,
+          message: 'Authentication failed or user not found'
+        }
+      }
+      #swagger.security = [{
+        "bearerAuth": []
+      }]
+    */
     const client_url = process.env.CLIENT_URL;
     // console.log("REQ", req);
     if (!req.user) {
