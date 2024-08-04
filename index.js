@@ -107,16 +107,16 @@ app.all("/", (req, res) => {
 });
 
 // //Test middlewares
-// app.use((req, res, next) => {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   res.setHeader(
-//     "Access-Control-Allow-Methods",
-//     "PUT, GET, POST, DELETE, OPTIONS"
-//   );
-//   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-//   // res.setHeader("Cross-Origin-Resource-Policy", "same-site");
-//   next();
-// });
+app.use((req, res, next) => {
+  // res.setHeader("Access-Control-Allow-Origin", "*");
+  // res.setHeader(
+  //   "Access-Control-Allow-Methods",
+  //   "PUT, GET, POST, DELETE, OPTIONS"
+  // );
+  // res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+  next();
+});
 
 // Routers
 app.use(require("./src/routers"));
