@@ -26,7 +26,6 @@ const cors = require("cors");
 const corsOptions = {
   origin: [
     process.env.CLIENT_URL,
-    `${process.env.CLIENT_URL}/`,
     "http://localhost:3000",
     "http://127.0.0.1:3000",
   ],
@@ -68,7 +67,7 @@ app.use(passport.session()); // session data controller
 app.use(express.json({ limit: "10kb" }));
 
 // Accept FormData
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
