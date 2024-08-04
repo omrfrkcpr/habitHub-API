@@ -24,13 +24,8 @@ connectDB();
 const cors = require("cors");
 
 const corsOptions = {
-  origin: [
-    process.env.CLIENT_URL,
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-  ],
+  origin: process.env.CLIENT_URL,
   methods: ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE", "OPTIONS"],
-  allowedHeaders: "Authorization, Content-Type",
   optionsSuccessStatus: 204,
   credentials: true,
 };
