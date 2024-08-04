@@ -27,6 +27,18 @@ module.exports = {
   // GET
   listTasks: async (req, res) => {
     /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "List Tasks"
+      #swagger.description = `
+          You can send query with endpoint for search[], sort[], page and limit.
+          <ul> Examples:
+              <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>
+              <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>
+              <li>URL/?<b>page=2&limit=1</b></li>
+          </ul>
+      `
+    */
+    /*
       - Extracts the selected date from the query parameters.
       - Initializes a filter to match tasks with due dates that include the selected date.
       - If the requesting user is not an admin, adds a userId filter to restrict results to the user's own tasks.
@@ -83,6 +95,17 @@ module.exports = {
   },
   // POST
   createTask: async (req, res) => {
+    /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "Create new Task"
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $ref: "#/definitions/Task'
+          }
+      }
+    */
     /*
       - Extracts the necessary fields for a new task from the request body.
       - Creates a new Task object using the extracted fields and sets the userId to the ID of the requesting user.
@@ -145,6 +168,16 @@ module.exports = {
   // GET /:id
   readTask: async (req, res) => {
     /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "Get Single Task"
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'Task ID',
+        required: true,
+        type: 'string'
+    }
+    */
+    /*
       - Finds the task by ID from the database.
       - If the user is not an admin, ensures the task belongs to the requesting user by adding userId to the query filter.
       - Populates the `userId` and `tagId` fields of the retrieved task for detailed information.
@@ -173,6 +206,23 @@ module.exports = {
   },
   // /:id => PUT / PATCH
   updateTask: async (req, res) => {
+    /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "Update Task"
+      #swagger.parameters['id'] = {
+          in: 'path',
+          description: 'Task ID',
+          required: true,
+          type: 'string'
+      }
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $ref: "#/definitions/Task'
+          }
+      }
+    */
     /*
       - The task matching the id is now assigned as the currentTask.
       - If there is any data that matches the date in the req.body from the dueDates in the currentTask, only extract it.
@@ -330,6 +380,33 @@ module.exports = {
   },
   // /id => POST
   extractTask: async (req, res) => {
+    /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "Extract Task Date"
+      #swagger.description = "Extracts a specific date from a task's due dates."
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'Task ID',
+        required: true,
+        type: 'string'
+      }
+      #swagger.parameters['body'] = {
+        in: 'body',
+        description: 'Date to be extracted from the task',
+        required: true,
+        schema: {
+          type: 'object',
+          properties: {
+          date: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Date to be extracted from the task'
+          }
+        },
+        required: ['date']
+      }
+    */
+
     const { date } = req.body;
     const currentTask = await Task.findById(req.params.id);
 
@@ -368,6 +445,16 @@ module.exports = {
   // /:id => DELETE
   destroyTask: async (req, res) => {
     /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "Delete Task"
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'Task ID',
+        required: true,
+        type: 'string'
+      }
+    */
+    /*
       - Finds the task by ID from the database.
       - If the task is not found, sets a 404 error status and throws an error.
       - If the requesting user is not the owner of the task, sets a 401 error status and throws an error.
@@ -386,6 +473,35 @@ module.exports = {
   },
   // /email => POST
   sendTasks: async (req, res) => {
+    /*
+      #swagger.tags = ["Tasks"]
+      #swagger.summary = "Get daily Tasks via Email"
+      #swagger.description = "This endpoint sends daily tasks to the user's email."
+      #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                userId: {
+                  type: "string",
+                  description: "The ID of the user",
+                  example: "66ae3084422bafb249797dbd"
+                },
+                date: {
+                  type: "string",
+                  format: "date",
+                  description: "The date for which to retrieve tasks (YYYY-MM-DD)",
+                  example: "2024-08-04"
+                }
+              },
+              required: ["userId", "date"]
+            }
+          }
+        }
+      }
+    */
     const { userId, date } = req.body;
 
     if (!userId || !date) {

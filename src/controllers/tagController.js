@@ -8,6 +8,18 @@ module.exports = {
   // GET
   listTags: async (req, res) => {
     /*
+            #swagger.tags = ["Tags"]
+            #swagger.summary = "List Tags"
+            #swagger.description = `
+                You can send query with endpoint for search[], sort[], page and limit.
+                <ul> Examples:
+                    <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>
+                    <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>
+                    <li>URL/?<b>page=2&limit=1</b></li>
+                </ul>
+            `
+        */
+    /*
       - Determines the filter based on whether the requesting user (req.user) is an admin.
       - If the user is not an admin, sets the filter to only include tags owned by the user.
       - Fetches the list of tags from the database using the filter.
@@ -28,6 +40,19 @@ module.exports = {
   },
   // /:id => GET
   listTagTasks: async (req, res) => {
+    /*
+            #swagger.tags = ["Tags"]
+            #swagger.summary = "List Tasks based on Tag"
+            #swagger.description = `
+                You can send query with endpoint for search[], sort[], page and limit.
+                <ul> Examples:
+                    <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>
+                    <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>
+                    <li>URL/?<b>page=2&limit=1</b></li>
+                </ul>
+            `
+    */
+
     /*
       - Sets the filter to fetch tasks associated with a specific tag ID.
       - If the user is not an admin, adds a condition to the filter to only include tasks owned by the user.
@@ -52,6 +77,17 @@ module.exports = {
   },
   // POST
   createTag: async (req, res) => {
+    /*
+      #swagger.tags = ["Tags"]
+      #swagger.summary = "Create new tag"
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $ref: "#/definitions/Tag'
+          }
+      }
+    */
     /*
       - Extracts the tag name from the request body.
       - Creates a new tag with the extracted name and the user ID of the requesting user.
@@ -86,6 +122,10 @@ module.exports = {
   // /:id => GET
   readTag: async (req, res) => {
     /*
+      #swagger.tags = ["Tags"]
+      #swagger.summary = "Get Single Tag"
+    */
+    /*
       - Tries to find the tag by ID from the database.
       - Checks if the tag exists and if the requesting user is the owner of the tag or an admin.
       - Sends the tag data in the response with a 200 status code if the tag is found and the user is authorized.
@@ -96,6 +136,17 @@ module.exports = {
   },
   // /:id => PUT/PATCH
   updateTag: async (req, res) => {
+    /*
+      #swagger.tags = ["Tags"]
+      #swagger.summary = "Update Tag"
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $ref: "#/definitions/Tag'
+          }
+      }
+    */
     /*
       - Tries to find the tag by ID from the database.
       - Checks if the tag exists and if the requesting user is the owner of the tag or an admin.
@@ -128,6 +179,10 @@ module.exports = {
   },
   // /:id => DELETE
   destroyTag: async (req, res) => {
+    /*
+      #swagger.tags = ["Tags"]
+      #swagger.summary = "Delete Tag"
+    */
     /*
       - Tries to find the tag by ID from the database.
       - Checks if the tag exists and if the requesting user is the owner of the tag or an admin.

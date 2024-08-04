@@ -12,7 +12,8 @@ const document = {
     version: packageJson.version,
     title: packageJson.name,
     description: packageJson.description,
-    termsOfService: "https://omrfrkcpr.vercel.app",
+    termsOfService:
+      "https://www.termsfeed.com/live/ed8b4e15-b05a-41d6-b12b-920a89756f29",
     contact: { name: packageJson.author, email: "omerrfarukcapur@gmail.com" },
     license: { name: packageJson.license },
   },
@@ -42,10 +43,6 @@ const document = {
     // Models:
     Tag: require("./src/models/tagModel").schema.obj,
     Task: require("./src/models/taskModel").schema.obj,
-    TokenBlacklist: require("./src/models/tokenBlacklistModel").schema.obj,
-    Token: require("./src/models/tokenModel").schema.obj,
-    TokenVerification: require("./src/models/tokenVerificationModel").schema
-      .obj,
     User: require("./src/models/userModel").schema.obj,
   },
 };

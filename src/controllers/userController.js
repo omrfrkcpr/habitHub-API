@@ -13,12 +13,23 @@ const {
 } = require("../helpers/deleteObjectByKeyNumberS3Bucket");
 const { extractDateNumber } = require("../helpers/extractDateNumber");
 const { CustomError } = require("../errors/customError");
-const { generateAllTokens } = require("../helpers/tokenGenerator");
 const { sendFeedbackEmail } = require("../configs/email/emailService");
 
 module.exports = {
   // GET
   listUsers: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "List Users"
+      #swagger.description = `
+        You can send query with endpoint for search[], sort[], page and limit.
+        <ul> Examples:
+            <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>
+            <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>
+            <li>URL/?<b>page=2&limit=1</b></li>
+        </ul>
+      `
+    */
     /*
       - Uses the getModelList function to filter and retrieve users.
       - Returns the data along with details about the model list.
@@ -33,6 +44,16 @@ module.exports = {
   },
   // /:id => GET
   readUser: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "Get Single User"
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'User ID',
+        required: true,
+        type: 'string'
+      }
+    */
     /*
       - Filters users based on whether the requesting user (req.user) is an admin or not. If the user is an admin, retrieves the requested user's details; otherwise, retrieves the details of the requesting user.
       - Uses User.findOne() to find the user based on the specified filters.
@@ -51,6 +72,19 @@ module.exports = {
   },
   // POST
   createUser: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "Create User"
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $ref: "#/definitions/User'
+          }
+      }
+    */
+    /*
+
     /*
       - Sets isAdmin to false by default if not provided in the request body.
       - Sets isActive to true by default.
@@ -102,6 +136,23 @@ module.exports = {
   },
   // /:id => PUT / PATCH
   updateUser: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "Update User"
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'User ID',
+        required: true,
+        type: 'string'
+      }      
+      #swagger.parameters['body'] = {
+          in: 'body',
+          required: true,
+          schema: {
+              $ref: "#/definitions/User'
+          }
+      }
+    */
     /*
       - Sets isAdmin based on whether the requesting user (req.user) is an admin.
       - Updates the user's information in the database using User.updateOne().
@@ -248,6 +299,43 @@ module.exports = {
   // feedback => POST
   handleFeedback: async (req, res) => {
     /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "Submit Feedback"
+      #swagger.description = "Handles user feedback submission by validating input and sending feedback via email."
+      #swagger.parameters['body'] = {
+        in: 'body',
+        description: 'Feedback submission data',
+        required: true,
+        schema: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string',
+              description: 'Name of the user',
+              example: 'John Doe'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Email address of the user',
+              example: 'john.doe@example.com'
+            },
+            subject: {
+              type: 'string',
+              description: 'Subject of the feedback',
+              example: 'Feedback Subject'
+            },
+            feedback: {
+              type: 'string',
+              description: 'Feedback message',
+              example: 'This is a feedback message.'
+            }
+          },
+          required: ['name', 'email', 'feedback']
+        }
+      }
+    */
+    /*
       - Validates the request body for required fields.
       - Calls sendFeedbackEmail() from emailService.js to send feedback email.
       - Returns a success message if the email is sent successfully.
@@ -269,6 +357,18 @@ module.exports = {
   },
   // agree-contract/:userId => PUT
   agreeContract: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "Agree to Contract"
+      #swagger.description = "Updates user agreement status to indicate they have agreed to the contract."
+      #swagger.parameters['userId'] = {
+        in: 'path',
+        description: 'ID of the user',
+        required: true,
+        type: 'string',
+        example: '60c72b2f9f1b2c6f4c8e9b6a'
+      }
+    */
     if (req.params.userId) {
       const user = await User.findOneAndUpdate(
         { _id: req.params.userId },
@@ -288,6 +388,16 @@ module.exports = {
   },
   // /:id => DELETE
   destroyUser: async (req, res) => {
+    /*
+      #swagger.tags = ["Users"]
+      #swagger.summary = "Delete User"
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'User ID',
+        required: true,
+        type: 'string'
+      }      
+    */
     /*
       - Determines the filter based on whether the requesting user (req.user) is an admin.
       - Deletes tasks and tags associated with the user using Task.deleteMany() and Tag.deleteMany().

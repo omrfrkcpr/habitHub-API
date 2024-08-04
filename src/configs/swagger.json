@@ -3,8 +3,8 @@
   "info": {
     "version": "1.0.0",
     "title": "habithub-api",
-    "description": "habitHub-express-mongoose",
-    "termsOfService": "https://omrfrkcpr.vercel.app",
+    "description": "habithub-express-mongoose",
+    "termsOfService": "https://www.termsfeed.com/live/ed8b4e15-b05a-41d6-b12b-920a89756f29",
     "contact": {
       "name": "omerrfarukcapur@gmail.com",
       "email": "omerrfarukcapur@gmail.com"
@@ -40,16 +40,6 @@
     "application/json"
   ],
   "paths": {
-    "/auth/login/success": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/auth/register": {
       "post": {
         "tags": [
@@ -67,15 +57,15 @@
               "properties": {
                 "firstName": {
                   "type": "string",
-                  "example": "test"
+                  "example": "John"
                 },
                 "lastName": {
                   "type": "string",
-                  "example": "test"
+                  "example": "Doe"
                 },
                 "email": {
                   "type": "string",
-                  "example": "testUser@gmail.com"
+                  "example": "john.doe@gmail.com"
                 },
                 "password": {
                   "type": "string",
@@ -93,7 +83,7 @@
       }
     },
     "/auth/verify-email/{token}": {
-      "get": {
+      "post": {
         "tags": [
           "Authentication"
         ],
@@ -111,9 +101,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
@@ -337,7 +324,11 @@
     },
     "/tasks/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "List Tasks",
+        "description": "\r  You can send query with endpoint for search[], sort[], page and limit.\r  <ul> Examples:\r  <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>\r  <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>\r  <li>URL/?<b>page=2&limit=1</b></li>\r  </ul>\r  ",
         "parameters": [
           {
             "name": "date",
@@ -352,196 +343,119 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Create new Task",
+        "description": "Extracts a specific date from a task's due dates.",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "tagId": {
-                  "example": "any"
-                },
-                "userId": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "cardColor": {
-                  "example": "any"
-                },
-                "repeat": {
-                  "example": "any"
-                },
-                "priority": {
-                  "example": "any"
-                },
-                "dueDates": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Task"
             }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Task ID",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "The ID of the user",
+                    "example": "66ae3084422bafb249797dbd"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The date for which to retrieve tasks (YYYY-MM-DD)",
+                    "example": "2024-08-04"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "date"
+                ]
+              }
+            }
           }
         }
       }
     },
     "/tasks/email": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "date": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "Tasks"
         ],
+        "summary": "Get daily Tasks via Email",
+        "description": "This endpoint sends daily tasks to the user's email.",
         "responses": {
           "200": {
             "description": "OK"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "The ID of the user",
+                    "example": "66ae3084422bafb249797dbd"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The date for which to retrieve tasks (YYYY-MM-DD)",
+                    "example": "2024-08-04"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "date"
+                ]
+              }
+            }
           }
         }
       }
     },
     "/tasks/{id}": {
       "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get Single Task",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Task ID"
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "example": "any"
-                },
-                "priority": {
-                  "example": "any"
-                },
-                "isCompleted": {
-                  "example": "any"
-                },
-                "tagId": {
-                  "example": "any"
-                },
-                "restOfBody": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "Accepted"
-          }
-        }
-      },
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found"
-          }
-        }
-      },
-      "patch": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "date": {
-                  "example": "any"
-                },
-                "priority": {
-                  "example": "any"
-                },
-                "isCompleted": {
-                  "example": "any"
-                },
-                "tagId": {
-                  "example": "any"
-                },
-                "restOfBody": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "202": {
-            "description": "Accepted"
-          }
-        }
-      }
-    },
-    "/tags/": {
-      "get": {
-        "description": "",
         "responses": {
           "200": {
             "description": "OK"
@@ -549,33 +463,238 @@
         }
       },
       "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Extract Task Date",
+        "description": "Extracts a specific date from a task's due dates.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Task ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "The ID of the user",
+                    "example": "66ae3084422bafb249797dbd"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The date for which to retrieve tasks (YYYY-MM-DD)",
+                    "example": "2024-08-04"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "date"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update Task",
+        "description": "Extracts a specific date from a task's due dates.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Task ID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "The ID of the user",
+                    "example": "66ae3084422bafb249797dbd"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The date for which to retrieve tasks (YYYY-MM-DD)",
+                    "example": "2024-08-04"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "date"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete Task",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Task ID"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update Task",
+        "description": "Extracts a specific date from a task's due dates.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Task ID"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "The ID of the user",
+                    "example": "66ae3084422bafb249797dbd"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "The date for which to retrieve tasks (YYYY-MM-DD)",
+                    "example": "2024-08-04"
+                  }
+                },
+                "required": [
+                  "userId",
+                  "date"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/": {
+      "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "List Tags",
+        "description": "\r  You can send query with endpoint for search[], sort[], page and limit.\r  <ul> Examples:\r   <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>\r   <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>\r   <li>URL/?<b>page=2&limit=1</b></li>\r  </ul>\r  ",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Create new tag",
         "description": "",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Tag"
             }
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "default": {
+            "description": ""
           }
         }
       }
     },
     "/tags/{id}": {
       "get": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Get Single Tag",
         "description": "",
         "parameters": [
           {
@@ -592,6 +711,10 @@
         }
       },
       "put": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Update Tag",
         "description": "",
         "parameters": [
           {
@@ -599,18 +722,27 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
           }
         ],
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "404": {
-            "description": "Not Found"
+          "default": {
+            "description": ""
           }
         }
       },
       "delete": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Delete Tag",
         "description": "",
         "parameters": [
           {
@@ -630,6 +762,10 @@
         }
       },
       "patch": {
+        "tags": [
+          "Tags"
+        ],
+        "summary": "Update Tag",
         "description": "",
         "parameters": [
           {
@@ -637,21 +773,30 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
           }
         ],
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
-          "404": {
-            "description": "Not Found"
+          "default": {
+            "description": ""
           }
         }
       }
     },
     "/tags/{id}/tasks": {
       "get": {
-        "description": "",
+        "tags": [
+          "Tags"
+        ],
+        "summary": "List Tasks based on Tag",
+        "description": "\r  You can send query with endpoint for search[], sort[], page and limit.\r  <ul> Examples:\r   <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>\r   <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>\r   <li>URL/?<b>page=2&limit=1</b></li>\r  </ul>\r  ",
         "parameters": [
           {
             "name": "id",
@@ -669,7 +814,11 @@
     },
     "/users/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "summary": "List Users",
+        "description": "\r  You can send query with endpoint for search[], sort[], page and limit.\r  <ul> Examples:\r  <li>URL/?<b>search[field1]=value1&search[field2]=value2</b></li>\r  <li>URL/?<b>sort[field1]=1&sort[field2]=-1</b></li>\r  <li>URL/?<b>page=2&limit=1</b></li>\r  </ul>\r  ",
         "responses": {
           "200": {
             "description": "OK"
@@ -677,43 +826,295 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Create User",
+        "description": "Handles user feedback submission by validating input and sending feedback via email.",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "isAdmin": {
-                  "example": "any"
+                "type": {
+                  "type": "string",
+                  "example": "object"
                 },
-                "isActive": {
-                  "example": "any"
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Name of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "John Doe"
+                        }
+                      }
+                    },
+                    "email": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "format": {
+                          "type": "string",
+                          "example": "email"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Email address of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        }
+                      }
+                    },
+                    "subject": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Subject of the feedback"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Feedback Subject"
+                        }
+                      }
+                    },
+                    "feedback": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Feedback message"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "This is a feedback message."
+                        }
+                      }
+                    }
+                  }
                 },
-                "password": {
-                  "example": "any"
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "name",
+                    "email",
+                    "feedback"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "description": "Feedback submission data"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string",
+            "example": "60c72b2f9f1b2c6f4c8e9b6a"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/users/agree-contract/{userId}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Agree to Contract",
+        "description": "Updates user agreement status to indicate they have agreed to the contract.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the user",
+            "example": "60c72b2f9f1b2c6f4c8e9b6a"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/users/feedback": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Submit Feedback",
+        "description": "Handles user feedback submission by validating input and sending feedback via email.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Feedback submission data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "object"
+                },
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Name of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "John Doe"
+                        }
+                      }
+                    },
+                    "email": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "format": {
+                          "type": "string",
+                          "example": "email"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Email address of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        }
+                      }
+                    },
+                    "subject": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Subject of the feedback"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Feedback Subject"
+                        }
+                      }
+                    },
+                    "feedback": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Feedback message"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "This is a feedback message."
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "name",
+                    "email",
+                    "feedback"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           }
         }
       }
     },
     "/users/{id}": {
       "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get Single User",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
@@ -723,65 +1124,150 @@
         }
       },
       "put": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User",
+        "description": "Handles user feedback submission by validating input and sending feedback via email.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User ID"
           },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "isActive": {
-                  "example": "any"
+                "type": {
+                  "type": "string",
+                  "example": "object"
                 },
-                "isAdmin": {
-                  "example": "any"
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Name of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "John Doe"
+                        }
+                      }
+                    },
+                    "email": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "format": {
+                          "type": "string",
+                          "example": "email"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Email address of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        }
+                      }
+                    },
+                    "subject": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Subject of the feedback"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Feedback Subject"
+                        }
+                      }
+                    },
+                    "feedback": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Feedback message"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "This is a feedback message."
+                        }
+                      }
+                    }
+                  }
                 },
-                "password": {
-                  "example": "any"
-                },
-                "oldPassword": {
-                  "example": "any"
-                },
-                "avatar": {
-                  "example": "any"
-                },
-                "username": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "firstName": {
-                  "example": "any"
-                },
-                "lastName": {
-                  "example": "any"
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "name",
+                    "email",
+                    "feedback"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
-            }
+            },
+            "description": "Feedback submission data"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string",
+            "example": "60c72b2f9f1b2c6f4c8e9b6a"
           }
         ],
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "default": {
+            "description": ""
           }
         }
       },
       "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete User",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User ID"
           }
         ],
         "responses": {
@@ -791,54 +1277,134 @@
         }
       },
       "patch": {
-        "description": "",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update User",
+        "description": "Handles user feedback submission by validating input and sending feedback via email.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "User ID"
           },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "isActive": {
-                  "example": "any"
+                "type": {
+                  "type": "string",
+                  "example": "object"
                 },
-                "isAdmin": {
-                  "example": "any"
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Name of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "John Doe"
+                        }
+                      }
+                    },
+                    "email": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "format": {
+                          "type": "string",
+                          "example": "email"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Email address of the user"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "john.doe@example.com"
+                        }
+                      }
+                    },
+                    "subject": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Subject of the feedback"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Feedback Subject"
+                        }
+                      }
+                    },
+                    "feedback": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "description": {
+                          "type": "string",
+                          "example": "Feedback message"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "This is a feedback message."
+                        }
+                      }
+                    }
+                  }
                 },
-                "password": {
-                  "example": "any"
-                },
-                "oldPassword": {
-                  "example": "any"
-                },
-                "avatar": {
-                  "example": "any"
-                },
-                "username": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "firstName": {
-                  "example": "any"
-                },
-                "lastName": {
-                  "example": "any"
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "name",
+                    "email",
+                    "feedback"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
-            }
+            },
+            "description": "Feedback submission data"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID of the user",
+            "required": true,
+            "type": "string",
+            "example": "60c72b2f9f1b2c6f4c8e9b6a"
           }
         ],
         "responses": {
-          "202": {
-            "description": "Accepted"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -1025,139 +1591,6 @@
         }
       }
     },
-    "TokenBlacklist": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
-            "unique": {
-              "type": "boolean",
-              "example": true
-            }
-          }
-        },
-        "createdAt": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "default": {
-              "type": "function"
-            },
-            "expires": {
-              "type": "string",
-              "example": "1d"
-            }
-          }
-        }
-      }
-    },
-    "Token": {
-      "type": "object",
-      "properties": {
-        "userId": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "ref": {
-              "type": "string",
-              "example": "User"
-            },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
-            "index": {
-              "type": "boolean",
-              "example": true
-            }
-          }
-        },
-        "token": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "trim": {
-              "type": "boolean",
-              "example": true
-            },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
-            "index": {
-              "type": "boolean",
-              "example": true
-            }
-          }
-        }
-      }
-    },
-    "TokenVerification": {
-      "type": "object",
-      "properties": {
-        "token": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
-            "unique": {
-              "type": "boolean",
-              "example": true
-            }
-          }
-        },
-        "userId": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "ref": {
-              "type": "string",
-              "example": "User"
-            },
-            "required": {
-              "type": "boolean",
-              "example": true
-            }
-          }
-        },
-        "createdAt": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "default": {
-              "type": "function"
-            },
-            "expires": {
-              "type": "string",
-              "example": "1h"
-            }
-          }
-        }
-      }
-    },
     "User": {
       "type": "object",
       "properties": {
@@ -1249,13 +1682,7 @@
             }
           }
         },
-        "twitterId": {
-          "type": "function"
-        },
         "googleId": {
-          "type": "function"
-        },
-        "githubId": {
           "type": "function"
         },
         "username": {
@@ -1274,6 +1701,18 @@
           }
         },
         "isAdmin": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "function"
+            },
+            "default": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        },
+        "isAgreed": {
           "type": "object",
           "properties": {
             "type": {
