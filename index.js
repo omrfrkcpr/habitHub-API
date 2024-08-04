@@ -29,8 +29,9 @@ const corsOptions = {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
   ],
-  methods: ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE"],
-  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "PATCH", "HEAD", "DELETE", "OPTIONS"],
+  allowedHeaders: "Authorization, Content-Type",
+  optionsSuccessStatus: 204,
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -112,10 +113,13 @@ app.all("/", (req, res) => {
 
 // //Test middlewares
 // app.use((req, res, next) => {
-//   //res.setHeader('Access-Control-Allow-Origin', '*');
-//   //res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-//   //res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-//   res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "PUT, GET, POST, DELETE, OPTIONS"
+//   );
+//   res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+//   // res.setHeader("Cross-Origin-Resource-Policy", "same-site");
 //   next();
 // });
 
