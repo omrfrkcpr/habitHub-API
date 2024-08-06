@@ -5,7 +5,7 @@ const fs = require("fs");
 
 module.exports = async function () {
   // Return null early to prevent the rest of the code from executing
-  return null;
+  // return null;
 
   const cardColors = [
     "#ADF7B6",
@@ -91,7 +91,7 @@ module.exports = async function () {
     const savedWorkRoutineTag = await workRoutineTag.save();
 
     // Verify tags are saved
-    const tags = await Tag.find(); // Fetch all tags to ensure they are saved
+    const tags = await Tag.find({ userId: user_userId }); // Fetch all tags to ensure they are saved
     console.log("Tags in database:", tags);
 
     if (tags.length === 0) {

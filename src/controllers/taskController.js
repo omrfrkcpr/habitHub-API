@@ -235,6 +235,8 @@ module.exports = {
     */
 
     const currentTask = await Task.findById(req.params.id);
+    // console.log("Current Task:", currentTask);
+    // console.log("Req.body: ", req.body);
 
     const reqDate = new Date(req.body.date);
     const reqDay = reqDate.getDate();
@@ -360,7 +362,6 @@ module.exports = {
       // Create a new task with the new date
       const newTaskData = {
         ...restOfBody,
-        dueDates: [date],
       };
 
       if (tagId) {
@@ -370,6 +371,8 @@ module.exports = {
       }
 
       const newTask = await createNewTask(newTaskData);
+
+      // console.log("New Task", newTask);
 
       return res.status(202).send({
         error: false,
