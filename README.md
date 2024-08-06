@@ -44,6 +44,7 @@
   <p align="center">
     The backend API for the Habithub project. It provides RESTful endpoints to manage tasks, users, and other related data. Built with Node.js and Express.js, it ensures efficient data handling and secure user authentication.
     <br />
+    <br />
     <a href="https://github.com/omrfrkcpr/habithub-api"><strong>Explore the docs »</strong></a>
     <br />
     <a href="https://github.com/omrfrkcpr/habithub"><strong>Habithub App»</strong></a>
@@ -83,8 +84,6 @@
 <!-- ABOUT THE PROJECT -->
 
 ## About The Project
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- AUTHENTICATION PROCESS -->
 
