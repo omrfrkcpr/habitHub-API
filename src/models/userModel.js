@@ -49,7 +49,6 @@ const UserSchema = new mongoose.Schema(
     // githubId: String,
     googleId: String,
     username: String,
-    avatar: String,
     isActive: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
     isAgreed: {
