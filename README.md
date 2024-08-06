@@ -92,7 +92,7 @@
 
 <p align="center">
   <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=nodejs,express,sqlite,sequelize,js,npm,postman" />
+    <img src="https://skillicons.dev/icons?i=nodejs,express,mongodb,js,docker,aws,npm,postman" />
   </a>
 </p>
 
