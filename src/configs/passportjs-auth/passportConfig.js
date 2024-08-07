@@ -3,8 +3,8 @@ const User = require("../../models/userModel");
 
 // Import individual strategy configurations
 require("./strategies/googleStrategy");
-require("./strategies/githubStrategy");
-require("./strategies/twitterStrategy");
+// require("./strategies/githubStrategy");
+// require("./strategies/twitterStrategy");
 
 // function to serialize a user/profile object into the session
 passport.serializeUser((user, done) => {

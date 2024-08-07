@@ -101,10 +101,10 @@ module.exports = {
     // Save new user to the database
     const newUser = await user.save();
 
-    // Get tokens for new user
-    const { tokenData, accessToken, refreshToken } = await generateAllTokens(
-      newUser
-    );
+    // // Get tokens for new user
+    // const { tokenData, accessToken, refreshToken } = await generateAllTokens(
+    //   newUser
+    // );
 
     // Create new Token in TokenVerificationModel
     const verificationTokenData = await TokenVerification.create({
@@ -125,12 +125,12 @@ module.exports = {
     res.status(201).send({
       error: false,
       message: "Please verify your email to complete your registration",
-      bearer: {
-        access: accessToken,
-        refresh: refreshToken,
-      },
-      token: tokenData.token,
-      user: newUser,
+      // bearer: {
+      //   access: accessToken,
+      //   refresh: refreshToken,
+      // },
+      // token: tokenData.token,
+      // user: newUser,
     });
   },
   // socialLogin: async (req, res) => {
