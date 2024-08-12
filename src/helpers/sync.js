@@ -5,7 +5,7 @@ const fs = require("fs");
 
 module.exports = async function () {
   // Return null early to prevent the rest of the code from executing
-  // return null;
+  return null;
 
   const cardColors = [
     "#ADF7B6",

@@ -2,6 +2,7 @@
 
 const { mongoose } = require("../configs/dbConnection");
 const validator = require("validator");
+const { CustomError } = require("../errors/customError");
 
 const UserSchema = new mongoose.Schema(
   {
