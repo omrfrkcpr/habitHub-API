@@ -1,0 +1,5 @@
+::ffff:127.0.0.1 - - [17/Aug/2024:11:33:04 +0000] "POST /auth/login HTTP/1.1" 500 152 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+::ffff:127.0.0.1 - - [17/Aug/2024:11:35:12 +0000] "POST /auth/login HTTP/1.1" 200 1113 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+::ffff:127.0.0.1 - - [17/Aug/2024:11:35:13 +0000] "GET /tasks?date=2024-08-17T11:32:41.520Z HTTP/1.1" 200 1412 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+::ffff:127.0.0.1 - - [17/Aug/2024:11:35:13 +0000] "GET /tags HTTP/1.1" 200 691 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+::ffff:127.0.0.1 - - [17/Aug/2024:11:38:10 +0000] "GET /tasks?date=2024-08-18T11:32:41.000Z HTTP/1.1" 200 10948 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"

@@ -324,13 +324,13 @@ module.exports = {
           let refreshToken = "";
 
           if (!tokenData) {
-            const tokens = generateAllTokens(user);
+            const tokens = await generateAllTokens(user);
             accessToken = tokens.accessToken;
             refreshToken = tokens.refreshToken;
             tokenData = tokens.tokenData;
           } else {
-            accessToken = generateAccessToken(user);
-            refreshToken = generateRefreshToken(user);
+            accessToken = await generateAccessToken(user);
+            refreshToken = await generateRefreshToken(user);
           }
 
           console.log("Login response data:", {
