@@ -12,6 +12,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MongoStore = require("connect-mongo");
 const { generalRateLimiter } = require("./src/middlewares/rateLimiters");
+const job = require("./src/helpers/cron");
 
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
