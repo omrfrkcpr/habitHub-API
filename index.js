@@ -16,6 +16,10 @@ const { generalRateLimiter } = require("./src/middlewares/rateLimiters");
 const PORT = process.env?.PORT || 8000;
 const HOST = process.env?.HOST || "127.0.0.1";
 
+// Cron job
+console.log("Cron job is being started...");
+job.start();
+
 // Connect to MongoDB
 const { connectDB } = require("./src/configs/dbConnection");
 connectDB();
